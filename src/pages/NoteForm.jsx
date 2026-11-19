@@ -4,6 +4,7 @@ import { ArrowLeft, CalendarDays, Plus } from 'lucide-react';
 import { getNote, listActivities, saveNote } from '../lib/db.js';
 import { daysUntil, formatDay } from '../lib/format.js';
 import { useAuth } from '../lib/auth.jsx';
+import { isConfigured } from '../lib/supabase.js';
 import { ATTRIBUTES, BREW_METHODS, ORIGINS, PROCESSES, ROAST_LEVELS } from '../data/options.js';
 import { FLAVOR_GROUPS } from '../data/flavors.js';
 import { Button, Card, FlavorChip, Label, Notice, ScaleInput, Spinner, StarInput, cx } from '../components/ui.jsx';
@@ -25,6 +26,8 @@ const EMPTY = {
 };
 
 export default function NoteForm() {
+  const { id } = useParams();
+  if (!isConfigured && !id) return <NoteFormInner preview />;
   return (
     <MemberGate what="노트를 쓰려면">
       <NoteFormInner />
@@ -32,7 +35,7 @@ export default function NoteForm() {
   );
 }
 
-function NoteFormInner() {
+function NoteFormInner({ preview = false }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -108,6 +111,7 @@ function NoteFormInner() {
 
   const submit = async (e) => {
     e.preventDefault();
+    if (preview) return;
     setTouched(true);
     if (beanMissing) {
       document.getElementById('bean_name')?.focus();
@@ -129,7 +133,8 @@ function NoteFormInner() {
       <Link to={id ? `/notes/${id}` : '/notes'} className="mb-6 inline-flex items-center gap-1 text-sm font-semibold text-muted hover:text-ink">
         <ArrowLeft size={16} /> {id ? '노트로 돌아가기' : '테이스팅 노트'}
       </Link>
-      <h1 className="mb-8 text-3xl font-bold tracking-tight">{id ? '노트 수정' : '테이스팅 노트 쓰기'}</h1>
+      <h1 className="mb-5 text-3xl font-bold tracking-tight">{id ? '노트 수정' : '테이스팅 노트 쓰기'}</h1>
+      {preview && <div className="mb-5"><Notice>작성 화면 미리보기예요. 향미와 별점을 골라 보세요. 입력한 내용은 저장되지 않아요.</Notice></div>}
 
       <div className="space-y-5">
         {(activities.length > 0 || form.activity_id) && (
@@ -282,8 +287,8 @@ function NoteFormInner() {
       <div className="sticky bottom-[calc(4.75rem+env(safe-area-inset-bottom))] z-10 mt-6 flex justify-end gap-2 md:bottom-4">
         <div className="flex gap-2 rounded-full border border-line bg-surface/95 p-1.5 shadow-[var(--shadow-card)] backdrop-blur">
           <Button variant="ghost" onClick={() => navigate(-1)} disabled={saving}>취소</Button>
-          <button type="submit" disabled={saving} className="inline-flex h-11 items-center rounded-full bg-accent px-6 font-semibold text-white hover:bg-accent-strong disabled:opacity-50">
-            {saving ? '저장 중…' : id ? '수정 완료' : '노트 올리기'}
+          <button type="submit" disabled={saving || preview} className="inline-flex h-11 items-center rounded-full bg-accent px-6 font-semibold text-white hover:bg-accent-strong disabled:opacity-50">
+            {preview ? '미리보기 · 저장 불가' : saving ? '저장 중…' : id ? '수정 완료' : '노트 올리기'}
           </button>
         </div>
       </div>

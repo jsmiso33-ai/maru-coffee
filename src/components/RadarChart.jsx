@@ -16,7 +16,7 @@ export default function RadarChart({ note, size = 240, compact = false }) {
 
   return (
     <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size} role="img" aria-label={`맛 프로필: ${summary}`} className="max-w-full h-auto">
-      {[1, 2, 3, 4, 5].map((v) => (
+      {[5, 4, 3, 2, 1].map((v) => (
         <polygon key={v} points={ring(v)} fill={v === 5 ? 'var(--color-paper)' : 'none'} stroke="var(--color-line)" strokeWidth={v === 5 ? 1.2 : 0.8} />
       ))}
       {ATTRIBUTES.map((_, i) => {

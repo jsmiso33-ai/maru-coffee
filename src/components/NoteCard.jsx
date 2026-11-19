@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
-import { Avatar, FlavorChip, Stars } from './ui.jsx';
+import { Star } from 'lucide-react';
+import { Avatar, FlavorChip } from './ui.jsx';
 import RadarChart from './RadarChart.jsx';
 import { formatDate } from '../lib/format.js';
 
@@ -8,16 +9,21 @@ export default function NoteCard({ note }) {
   return (
     <Link
       to={`/notes/${note.id}`}
-      className="group flex h-full flex-col rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:border-line-strong"
+      className="note-card group"
     >
-      <div className="flex items-start gap-4">
+      <div className="note-topline">
+        <span>{[note.roaster, note.brew_method].filter(Boolean).join(' · ') || '테이스팅 노트'}</span>
+        <span className="note-rating" aria-label={`별점 ${Number(note.rating).toFixed(1)}점`}>
+          <Star size={13} fill="currentColor" /> {Number(note.rating).toFixed(1)}
+        </span>
+      </div>
+      <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-medium text-muted">{note.roaster || '로스터리 미기재'}</p>
-          <h3 className="mt-1 text-[1.05rem] font-bold leading-snug group-hover:text-accent">{note.bean_name}</h3>
-          {meta && <p className="mt-1 text-sm text-muted">{meta}</p>}
+          <h3 className="text-lg font-bold leading-snug tracking-tight group-hover:text-accent">{note.bean_name}</h3>
+          {meta && <p className="mt-1.5 text-sm text-muted">{meta}</p>}
         </div>
-        <div className="shrink-0 opacity-90" aria-hidden>
-          <RadarChart note={note} size={64} compact />
+        <div className="shrink-0" aria-hidden>
+          <RadarChart note={note} size={54} compact />
         </div>
       </div>
 
@@ -30,16 +36,12 @@ export default function NoteCard({ note }) {
 
       {note.memo && <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-ink-soft">{note.memo}</p>}
 
-      <div className="mt-auto flex items-center justify-between gap-3 pt-5">
+      <div className="note-signature">
         <span className="flex min-w-0 items-center gap-2 text-sm">
           <Avatar name={note.author_name} src={note.author_avatar} size={24} />
           <span className="truncate font-medium text-ink-soft">{note.author_name}</span>
-          <span className="shrink-0 text-xs text-muted tnum">{formatDate(note.tasted_on || note.created_at)}</span>
         </span>
-        <span className="flex shrink-0 items-center gap-1.5">
-          <Stars value={Number(note.rating)} size={14} />
-          <span className="text-sm font-semibold tnum">{Number(note.rating).toFixed(1)}</span>
-        </span>
+        <time className="shrink-0 text-xs text-muted tnum" dateTime={(note.tasted_on || note.created_at)?.slice(0, 10)}>{formatDate(note.tasted_on || note.created_at)}</time>
       </div>
     </Link>
   );

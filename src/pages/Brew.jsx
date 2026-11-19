@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
-import { Minus, Plus, Save } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router';
+import { Minus, Plus, Save, Timer } from 'lucide-react';
 import { BREW_PRESETS, STANDARD_RECIPES } from '../data/recipes.js';
 import { Button, Card, PageHeader, cx } from '../components/ui.jsx';
 import BrewTimer from '../components/BrewTimer.jsx';
@@ -49,6 +49,12 @@ function buildSchedule({ method, dose, water, bloomX, pours, interval, totalTime
 
 export default function Brew() {
   const navigate = useNavigate();
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (hash !== '#brew-timer' || !window.matchMedia('(max-width: 63.99rem)').matches) return;
+    const frame = requestAnimationFrame(() => document.getElementById('brew-timer')?.focus());
+    return () => cancelAnimationFrame(frame);
+  }, [hash]);
   const [method, setMethod] = useState('V60');
   const preset = BREW_PRESETS.find((p) => p.method === method);
   const [dose, setDose] = useState('15');
@@ -111,7 +117,7 @@ export default function Brew() {
       </PageHeader>
 
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_1.05fr]">
-        <div className="space-y-5">
+        <div id="brew-settings" tabIndex={-1} className="space-y-5 scroll-mt-24">
           <Card className="p-5 sm:p-6">
             <fieldset>
               <legend className="mb-2.5 text-sm font-semibold">추출 방식</legend>
@@ -130,7 +136,7 @@ export default function Brew() {
               </div>
             </fieldset>
 
-            <div className="mt-6 grid grid-cols-[1fr_auto_1fr] items-end gap-2 sm:gap-3">
+            <div className="brew-quantities mt-6 grid grid-cols-[1fr_auto_1fr] items-end gap-2 sm:gap-3">
               <BigNumber label="원두" unit="g" value={dose} onChange={(v) => { setDose(v); setWaterText(null); }} step={isEspresso ? 0.5 : 1} />
               <span className="pb-4 font-display text-2xl text-muted">×</span>
               <BigNumber label="비율 1 :" value={ratio} onChange={(v) => { setRatio(v); setWaterText(null); }} step={0.5} />
@@ -154,6 +160,11 @@ export default function Brew() {
                   ? `권장 추출 시간 27~32초 · ${preset.temp}°C`
                   : `물 온도 ${preset.temp}°C · 컵에 남는 양 약 ${Math.max(0, Math.round(water - doseN * 2))}g (원두가 약 2배 머금음)`}
               </p>
+              {schedule && method !== '콜드브루' && (
+                <a href="#brew-timer" className="mt-2 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-accent lg:hidden">
+                  <Timer size={16} /> 타이머로 이동
+                </a>
+              )}
             </div>
           </Card>
 
@@ -169,7 +180,8 @@ export default function Brew() {
           <ExtractionCalc defaultDose={doseN} defaultBeverage={Math.max(0, Math.round(water - doseN * 2))} />
         </div>
 
-        <div className="space-y-3 lg:sticky lg:top-24">
+        <div id="brew-timer" tabIndex={-1} className="scroll-mt-20 space-y-3 lg:sticky lg:top-24">
+          {schedule && <a href="#brew-settings" className="inline-flex min-h-11 items-center text-sm font-semibold text-accent lg:hidden">계산 설정으로</a>}
           {schedule && (method === '콜드브루' ? (
             <Card className="p-5">
               <h2 className="text-sm font-semibold text-muted">콜드브루 순서 · {formatDuration(schedule.total)}</h2>
@@ -198,7 +210,7 @@ function BigNumber({ label, unit, value, onChange, step }) {
   const bump = (d) => onChange(String(Math.max(step, round1(n + d))));
   return (
     <div>
-      <p className="text-xs font-semibold text-muted">{label}</p>
+      <p className="text-sm font-semibold text-muted">{label}</p>
       <div className="mt-1 flex items-center rounded-2xl border border-line bg-paper">
         <button type="button" onClick={() => bump(-step)} aria-label={`${label} 줄이기`} className="grid h-14 w-10 shrink-0 place-items-center text-muted hover:text-ink"><Minus size={16} /></button>
         <input

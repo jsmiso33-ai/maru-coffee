@@ -14,7 +14,7 @@ const BUTTON = {
 
 export function Button({ variant = 'primary', size = 'md', to, className, children, ...rest }) {
   const cls = cx(
-    'inline-flex items-center justify-center gap-1.5 rounded-full font-semibold transition-colors disabled:opacity-50 disabled:pointer-events-none select-none',
+    'inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors active:translate-y-px disabled:opacity-50 disabled:pointer-events-none select-none',
     size === 'sm' ? 'h-11 px-4 text-sm sm:h-9 sm:px-3.5' : size === 'lg' ? 'h-13 px-6 text-base' : 'h-11 px-5 text-[0.95rem]',
     BUTTON[variant],
     className,
@@ -190,10 +190,10 @@ export function Notice({ tone = 'neutral', icon: Icon, children, action }) {
 
 export function PageHeader({ eyebrow, title, children, action }) {
   return (
-    <header className="flex flex-wrap items-end justify-between gap-4 pb-6 pt-2">
+    <header className="page-heading">
       <div className="min-w-0">
-        {eyebrow && <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-muted">{eyebrow}</p>}
-        <h1 className="text-[1.75rem] font-bold leading-tight tracking-tight sm:text-4xl">{title}</h1>
+        {eyebrow && <p className="page-kicker">{eyebrow}</p>}
+        <h1 className="text-[clamp(1.85rem,3.6vw,2.8rem)] font-bold leading-tight tracking-[-0.055em]">{title}</h1>
         {children && <p className="mt-2 max-w-xl text-[0.95rem] leading-relaxed text-muted">{children}</p>}
       </div>
       {action}

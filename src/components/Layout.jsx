@@ -4,7 +4,7 @@ import { House, CalendarDays, NotebookPen, BookOpen, Timer, LogOut, Users, Eye }
 import { useAuth } from '../lib/auth.jsx';
 import { isConfigured } from '../lib/supabase.js';
 import { CLUB } from '../lib/config.js';
-import { Avatar, Notice, Spinner, cx } from './ui.jsx';
+import { Avatar, Spinner, cx } from './ui.jsx';
 
 const NAV = [
   { to: '/', label: '홈', icon: House, end: true },
@@ -16,9 +16,9 @@ const NAV = [
 
 function Wordmark() {
   return (
-    <Link to="/" className="group flex items-baseline gap-2 py-2.5" aria-label={`${CLUB.name} 홈`}>
-      <span className="font-display text-[1.6rem] font-semibold leading-none tracking-[-0.02em]">{CLUB.name}</span>
-      <span className="hidden text-xs font-medium text-muted sm:inline">{CLUB.tagline}</span>
+    <Link to="/" className="wordmark" aria-label={`${CLUB.name} 홈`}>
+      <img src={`${import.meta.env.BASE_URL}favicon.svg`} width="35" height="35" alt="" />
+      <span><b>{CLUB.name}</b><small>Coffee Club</small></span>
     </Link>
   );
 }
@@ -73,13 +73,44 @@ function AccountMenu() {
 
 function AuthArea() {
   const { user, loading, signIn } = useAuth();
-  if (!isConfigured) return null;
+  if (!isConfigured) return <PreviewInfo />;
   if (loading && !user) return <span className="h-10 w-24" />;
   if (user) return <AccountMenu />;
   return (
     <button type="button" onClick={signIn} className="inline-flex h-11 items-center gap-2 rounded-full border border-line-strong bg-surface px-4 text-sm font-semibold transition-colors hover:bg-sunken">
       <GoogleMark /> 로그인
     </button>
+  );
+}
+
+function PreviewInfo() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const trigger = useRef(null);
+  const { pathname } = useLocation();
+  useEffect(() => { setOpen(false); }, [pathname]);
+  useEffect(() => {
+    if (!open) return;
+    const outside = (event) => { if (!ref.current?.contains(event.target)) setOpen(false); };
+    const escape = (event) => {
+      if (event.key === 'Escape') { setOpen(false); trigger.current?.focus(); }
+    };
+    document.addEventListener('pointerdown', outside);
+    document.addEventListener('keydown', escape);
+    return () => {
+      document.removeEventListener('pointerdown', outside);
+      document.removeEventListener('keydown', escape);
+    };
+  }, [open]);
+  return (
+    <div ref={ref} className="relative">
+      <button ref={trigger} type="button" aria-expanded={open} aria-controls="preview-info" onClick={() => setOpen(!open)} className="preview-toggle">
+        <Eye size={15} /> 미리보기
+      </button>
+      <div id="preview-info" hidden={!open} className="preview-info">
+        샘플 노트를 둘러볼 수 있어요. 표준 레시피, 계산기와 타이머는 바로 사용할 수 있어요.
+      </div>
+    </div>
   );
 }
 
@@ -103,18 +134,18 @@ export default function Layout() {
       <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-paper">
         본문으로 건너뛰기
       </a>
-      <header className="sticky top-0 z-20 border-b border-line/80 bg-paper/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6">
+      <header className="sticky top-0 z-20 border-b border-line bg-paper/95 backdrop-blur">
+        <div className="site-width flex h-16 items-center justify-between gap-3 md:h-[4.5rem]">
           <Wordmark />
-          <nav aria-label="주요 메뉴" className="hidden items-center gap-1 md:flex">
+          <nav aria-label="주요 메뉴" className="hidden h-full items-stretch gap-2 md:flex lg:gap-5">
             {NAV.map(({ to, label, end }) => (
               <NavLink
                 key={to}
                 to={to}
                 end={end}
                 className={({ isActive }) => cx(
-                  'rounded-full px-3.5 py-2 text-[0.95rem] font-semibold transition-colors',
-                  isActive ? 'bg-ink text-paper' : 'text-ink-soft hover:bg-sunken',
+                  'desktop-nav-link',
+                  isActive && 'is-current',
                 )}
               >
                 {label}
@@ -125,22 +156,14 @@ export default function Layout() {
         </div>
       </header>
 
-      {!isConfigured && (
-        <div className="mx-auto max-w-6xl px-4 pt-4 sm:px-6">
-          <Notice icon={Eye}>
-            <strong className="font-semibold">미리보기 모드</strong> — Supabase가 아직 연결되지 않아 샘플 노트만 보여요. 계산기·타이머·표준 레시피는 그대로 쓸 수 있어요.
-          </Notice>
-        </div>
-      )}
-
-      <main id="main" className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pt-10">
+      <main id="main" className="site-width pb-16 pt-6 sm:pt-9">
         <Suspense fallback={<Spinner />}>
           <Outlet />
         </Suspense>
       </main>
 
       <footer className="border-t border-line">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-6 text-sm text-muted sm:px-6 sm:py-8">
+        <div className="site-width flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-6 text-sm text-muted sm:py-8">
           <p><span className="font-display font-semibold text-ink">{CLUB.name}</span> · {CLUB.school} {CLUB.tagline}</p>
           <div className="flex items-center gap-4">
             {CLUB.instagram && (
@@ -160,8 +183,8 @@ export default function Layout() {
                 to={to}
                 end={end}
                 className={({ isActive }) => cx(
-                  'flex h-[4.25rem] flex-col items-center justify-center gap-1 text-xs font-semibold',
-                  isActive ? 'text-accent' : 'text-muted',
+                  'mobile-nav-link',
+                  isActive && 'is-current',
                 )}
               >
                 <Icon size={22} strokeWidth={1.8} />

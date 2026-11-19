@@ -2,26 +2,26 @@
 
 /* MARU 디자인 토큰 — 따뜻한 종이색 바탕, 에스프레소 잉크, 고려대 크림슨 한 가지 포인트 */
 @theme {
-  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
-  --font-display: 'Fraunces', 'Pretendard Variable', Georgia, serif;
+  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Malgun Gothic', system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
 
-  --color-paper: #f5efe6;
-  --color-surface: #fffcf7;
-  --color-sunken: #ede5d8;
-  --color-line: #e2d7c6;
-  --color-line-strong: #cbbba4;
-  --color-ink: #2a1f1a;
-  --color-ink-soft: #4a3d35;
-  --color-muted: #6f6258; /* sunken 위에서도 4.5:1 이상 */
+  --color-paper: #faf8f3;
+  --color-surface: #fffefa;
+  --color-sunken: #f0ece4;
+  --color-line: #ded9cf;
+  --color-line-strong: #b7aa98;
+  --color-ink: #302a25;
+  --color-ink-soft: #504940;
+  --color-muted: #6c645a;
   --color-outline: #9d8a73; /* 빈 별 등 그래픽 윤곽선 (3:1) */
-  --color-accent: #8e2433;
-  --color-accent-strong: #741a28;
-  --color-accent-soft: #f3e0dc;
+  --color-accent: #782d38;
+  --color-accent-strong: #5c202a;
+  --color-accent-soft: #f3e7e7;
   --color-crema: #c79a6b;
   --color-ok: #4f7a52;
 
-  --radius-card: 1.125rem;
-  --shadow-card: 0 1px 0 rgb(42 31 26 / 0.04), 0 8px 24px -12px rgb(42 31 26 / 0.18);
+  --radius-card: 0.75rem;
+  --shadow-card: 0 2px 4px rgb(48 42 37 / 0.025);
 }
 
 html {
@@ -96,6 +96,141 @@ input[type='number']::-webkit-outer-spin-button {
 }
 input[type='number'] {
   -moz-appearance: textfield;
+}
+
+.site-width {
+  width: min(calc(100% - 3rem), 74rem);
+  margin-inline: auto;
+}
+.wordmark { display: inline-flex; align-items: center; gap: .55rem; min-height: 44px; }
+.wordmark > span { display: grid; }
+.wordmark b { font: 600 1.68rem/.95 var(--font-display); letter-spacing: -.055em; }
+.wordmark small { margin-top: .26rem; font: 600 .61rem/1 var(--font-sans); letter-spacing: .16em; text-transform: uppercase; }
+.desktop-nav-link {
+  position: relative; display: grid; place-items: center; padding-inline: .55rem;
+  color: var(--color-muted); font-size: .94rem; font-weight: 600;
+}
+.desktop-nav-link:hover, .desktop-nav-link.is-current { color: var(--color-accent); }
+.desktop-nav-link.is-current::after {
+  content: ''; position: absolute; inset: auto .4rem 0; height: 3px; background: var(--color-accent);
+}
+.mobile-nav-link {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: .25rem; min-height: 4rem; font-size: .75rem; font-weight: 600; color: var(--color-muted);
+}
+.mobile-nav-link.is-current { color: var(--color-accent); }
+.mobile-nav-link.is-current::before {
+  content: ''; position: absolute; top: 0; width: 1.8rem; height: 3px; background: currentColor;
+}
+.preview-toggle { display: inline-flex; align-items: center; gap: .45rem; min-height: 44px; color: var(--color-muted); font-size: .875rem; }
+.preview-toggle:hover, .preview-toggle[aria-expanded='true'] { color: var(--color-accent); }
+.preview-info {
+  position: absolute; top: 100%; right: 0; width: min(17rem, calc(100vw - 2rem));
+  padding: 1rem; border: 1px solid var(--color-line); border-radius: .6rem;
+  background: var(--color-surface); box-shadow: 0 6px 20px rgb(48 42 37 / .08);
+  font-size: .875rem; line-height: 1.65;
+}
+.journal-home { display: grid; gap: clamp(2.5rem, 4.5vw, 4rem); }
+.journal-cover { display: grid; grid-template-columns: .94fr 1.06fr; align-items: stretch; gap: clamp(2rem, 5vw, 5rem); }
+.cover-copy { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; padding-block: .75rem 1.1rem; }
+.club-byline { display: flex; align-items: center; gap: .6rem; color: var(--color-accent); font-size: .875rem; font-weight: 650; }
+.club-byline::before { content: ''; width: 1.7rem; height: 1px; background: currentColor; }
+.cover-title {
+  margin-block: 1.15rem .9rem; font: 500 clamp(4.6rem, 6.55vw, 6.15rem)/.92 var(--font-display);
+  letter-spacing: -.065em;
+}
+.cover-title em { display: block; color: var(--color-accent); font-weight: 400; }
+.cover-intro { max-width: 29rem; color: var(--color-ink-soft); font-size: 1rem; line-height: 1.72; text-wrap: pretty; }
+.cover-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.45rem; }
+.cover-photo {
+  display: block; position: relative; overflow: hidden; isolation: isolate; border-radius: .7rem;
+  min-height: clamp(21rem, 29vw, 25rem); background: #493a2c; color: white;
+}
+.cover-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 54% 52%; transition: transform .45s ease; }
+.cover-photo::after { content: ''; position: absolute; inset: 42% 0 0; background: linear-gradient(transparent, rgb(20 14 10 / .75)); }
+.photo-caption { position: absolute; z-index: 1; inset: auto 1.55rem 1.3rem; display: flex; align-items: flex-end; justify-content: space-between; }
+.photo-caption small { display: flex; align-items: center; gap: .4rem; margin-bottom: .22rem; font-size: .8rem; font-weight: 500; }
+.photo-caption b { font-size: 1.22rem; letter-spacing: -.025em; }
+.photo-open { display: grid; place-items: center; width: 2.45rem; height: 2.45rem; border: 1px solid rgb(255 255 255 / .65); border-radius: 50%; }
+@media (hover: hover) { .cover-photo:hover img { transform: scale(1.025); } }
+.journal-stats {
+  display: flex; align-items: center; gap: clamp(1.5rem,4vw,4rem); margin-top: 2rem;
+  padding: 1.3rem 0; border-block: 1px solid var(--color-line);
+}
+.stat-counts { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); }
+.stat-counts > div { display: flex; flex-direction: column-reverse; gap: .25rem; padding-left: clamp(.8rem, 2vw, 2rem); border-left: 1px solid var(--color-line); }
+.stat-counts > div:first-child { padding-left: 0; border-left: 0; }
+.stat-counts dt, .popular-flavors p { color: var(--color-muted); font-size: .8125rem; font-weight: 550; }
+.stat-counts dd { font: 500 2.05rem/1 var(--font-display); font-variant-numeric: lining-nums tabular-nums; }
+.popular-flavors { flex: 1; min-width: 0; padding-left: clamp(1rem, 3vw, 3rem); border-left: 1px solid var(--color-line); }
+.popular-flavors > div { display: flex; flex-wrap: wrap; align-items: center; column-gap: .4rem; }
+.popular-flavors a { display: inline-flex; align-items: center; min-height: 2rem; }
+.popular-flavors a:hover > span { border-color: var(--color-accent); color: var(--color-accent); }
+.section-head { display: flex; align-items: center; justify-content: space-between; gap: .7rem; margin-bottom: 1.1rem; }
+.section-head h2 { font-size: clamp(1.4rem, 2.2vw, 1.85rem); font-weight: 700; letter-spacing: -.055em; line-height: 1.25; }
+.section-head a { display: inline-flex; flex-shrink: 0; align-items: center; gap: .45rem; min-height: 2.75rem; color: var(--color-muted); font-size: .875rem; font-weight: 550; }
+.section-head a:hover, .recipe-row:hover b { color: var(--color-accent); }
+.note-card {
+  display: flex; flex-direction: column; min-width: 0; height: 100%; padding: 1.25rem;
+  border: 1px solid var(--color-line); border-radius: var(--radius-card); background: var(--color-surface);
+  transition: border-color .18s, box-shadow .18s;
+}
+.note-card:hover { border-color: var(--color-line-strong); box-shadow: 0 5px 18px rgb(48 42 37 / .055); }
+.note-topline, .note-signature { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.note-topline { margin-bottom: .65rem; color: var(--color-muted); font-size: .8rem; }
+.note-rating { display: flex; align-items: center; gap: .28rem; color: var(--color-accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+.note-signature { margin-top: auto; padding-top: .85rem; border-top: 1px solid var(--color-line); }
+.note-card > :nth-last-child(2) { margin-bottom: 1rem; }
+.brew-shelf { display: grid; grid-template-columns: 1.7fr 1fr; gap: 1.5rem; }
+.recipe-list { border-top: 1px solid var(--color-line-strong); }
+.recipe-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: clamp(.7rem,2vw,2rem); padding: .95rem .25rem; border-bottom: 1px solid var(--color-line); }
+.recipe-row small, .recipe-row b { display: block; }
+.recipe-row small, .recipe-spec, .recipe-time { font-size: .8125rem; color: var(--color-muted); }
+.recipe-row b { margin-top: .15rem; font-size: 1.04rem; }
+.recipe-time { display: flex; align-items: center; justify-content: flex-end; gap: .65rem; font-variant-numeric: tabular-nums; }
+.brew-tool { display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1.5rem; background: var(--color-accent); color: #fffaf4; border-radius: var(--radius-card); }
+.brew-tool:hover { background: var(--color-accent-strong); }
+.brew-tool h3 { font-weight: 650; font-size: 1.4rem; letter-spacing: -.04em; }
+.brew-tool p { margin-top: .3rem; font-size: .9rem; }
+.brew-tool > span { display: inline-flex; align-items: center; gap: .5rem; font-size: .875rem; }
+.page-heading { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem; padding-block: .6rem 1.7rem; border-bottom: 1px solid var(--color-line); margin-bottom: 1.6rem; }
+.page-kicker { margin-bottom: .5rem; color: var(--color-accent); font: italic 1.2rem/1.25 var(--font-display); }
+.filter-panel { padding: 1rem; background: var(--color-sunken); border-radius: var(--radius-card); }
+
+@media (max-width: 47.99rem) {
+  .site-width { width: min(calc(100% - 2.25rem), 38rem); }
+  .journal-cover { grid-template-columns: 1fr; gap: 1.35rem; }
+  .cover-copy { padding-block: 0; }
+  .cover-title { font-size: clamp(3.45rem, 10vw, 4.65rem); line-height: 1; margin-block: .7rem; }
+  .cover-title em { display: inline; margin-inline-start: .045em; }
+  .cover-actions { margin-top: 1rem; }
+  .cover-actions > a { min-height: 3rem; }
+  .cover-photo { min-height: 0; aspect-ratio: 1.85; }
+  .photo-caption { inset: auto 1rem .9rem; }
+  .journal-stats { flex-direction: column; align-items: stretch; gap: .75rem; padding: 1rem 0; margin-top: 1.3rem; }
+  .stat-counts > div { align-items: center; padding-left: 0; }
+  .stat-counts dd { font-size: 1.65rem; }
+  .popular-flavors { display: flex; align-items: baseline; gap: .7rem; border: 0; border-top: 1px solid var(--color-line); padding: .65rem 0 0; }
+  .popular-flavors > p { flex-shrink: 0; }
+  .popular-flavors > div { column-gap: .25rem; }
+  .section-head { margin-bottom: .75rem; }
+  .brew-shelf { grid-template-columns: 1fr; }
+}
+@media (max-width: 24rem) {
+  .cover-actions > a { padding-inline: .9rem; }
+  .recipe-spec { display: none; }
+  .recipe-row { grid-template-columns: 1fr auto; }
+}
+@media (max-width: 30rem) {
+  .note-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .note-filters select { min-width: 0; width: 100%; padding-inline: .65rem 1.8rem; font-size: .83rem; }
+  .note-filters > div:last-child { grid-column: 1 / -1; }
+}
+@media (max-width: 26rem) {
+  .brew-quantities { grid-template-columns: 1fr; }
+  .brew-quantities > span { display: none; }
+  .brew-quantities > div { display: grid; grid-template-columns: minmax(4.5rem, 1fr) minmax(0, 2.5fr); align-items: center; gap: .5rem; }
+  .brew-quantities button { min-width: 2.75rem; height: 3rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
