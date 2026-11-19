@@ -122,7 +122,7 @@ export default function BrewTimer({ steps, total, water }) {
       <div className="px-5 pb-5 pt-6 sm:px-8 sm:pt-8">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-paper/50">{done ? '완료' : running ? '진행 중' : elapsed > 0 ? '일시정지' : '준비'}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-paper/65">{done ? '완료' : running ? '진행 중' : elapsed > 0 ? '일시정지' : '준비'}</p>
             <p className="mt-1 font-display text-[4.5rem] font-light leading-none tnum sm:text-[5.5rem]" aria-live="off">
               {mmss(Math.floor(elapsed))}
             </p>
@@ -188,7 +188,7 @@ export default function BrewTimer({ steps, total, water }) {
             key={i}
             className={cx(
               'flex items-center gap-4 px-5 py-3 sm:px-8',
-              i === currentIndex ? 'bg-paper/10 text-paper' : i < currentIndex ? 'text-paper/40' : 'text-paper/75',
+              i === currentIndex ? 'bg-paper/10 text-paper' : i < currentIndex ? 'text-paper/55' : 'text-paper/75',
             )}
           >
             <span className="w-12 shrink-0 tnum font-semibold">{mmss(s.at)}</span>

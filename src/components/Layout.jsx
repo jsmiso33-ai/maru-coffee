@@ -1,10 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import { House, NotebookPen, BookOpen, Timer, LogOut, Users, Eye } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import { isConfigured } from '../lib/supabase.js';
 import { CLUB } from '../lib/config.js';
-import { Avatar, Notice, cx } from './ui.jsx';
+import { Avatar, Notice, Spinner, cx } from './ui.jsx';
 
 const NAV = [
   { to: '/', label: '홈', icon: House, end: true },
@@ -48,7 +48,7 @@ function AccountMenu() {
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="flex items-center gap-2 rounded-full py-1 pl-1 pr-3 hover:bg-sunken"
+        className="flex h-11 items-center gap-2 rounded-full pl-1.5 pr-3 transition-colors hover:bg-sunken"
       >
         <Avatar name={displayName} src={avatar} size={30} />
         <span className="max-w-[7rem] truncate text-sm font-semibold">{displayName}</span>
@@ -73,10 +73,10 @@ function AccountMenu() {
 function AuthArea() {
   const { user, loading, signIn } = useAuth();
   if (!isConfigured) return null;
-  if (loading && !user) return <span className="h-9 w-20" />;
+  if (loading && !user) return <span className="h-10 w-24" />;
   if (user) return <AccountMenu />;
   return (
-    <button type="button" onClick={signIn} className="inline-flex h-9 items-center gap-2 rounded-full border border-line-strong bg-surface px-3.5 text-sm font-semibold hover:bg-sunken">
+    <button type="button" onClick={signIn} className="inline-flex h-10 items-center gap-2 rounded-full border border-line-strong bg-surface px-4 text-sm font-semibold transition-colors hover:bg-sunken">
       <GoogleMark /> 로그인
     </button>
   );
@@ -133,7 +133,9 @@ export default function Layout() {
       )}
 
       <main id="main" className="mx-auto max-w-6xl px-4 pb-16 pt-6 sm:px-6 sm:pt-10">
-        <Outlet />
+        <Suspense fallback={<Spinner />}>
+          <Outlet />
+        </Suspense>
       </main>
 
       <footer className="border-t border-line">

@@ -8,7 +8,7 @@ import { FLAVOR_GROUPS } from '../data/flavors.js';
 import { Button, Card, FlavorChip, Label, Notice, ScaleInput, Spinner, StarInput, cx } from '../components/ui.jsx';
 import MemberGate from '../components/MemberGate.jsx';
 import RadarChart from '../components/RadarChart.jsx';
-import { NotFound } from './NoteDetail.jsx';
+import { NotFound } from './NotFound.jsx';
 
 const MAX_FLAVORS = 12;
 
@@ -235,7 +235,7 @@ function OptionRow({ label, options, value, onChange }) {
             aria-pressed={value === o}
             onClick={() => onChange(value === o ? '' : o)}
             className={cx(
-              'h-9 rounded-full border px-3.5 text-sm transition-colors',
+              'h-11 rounded-full border px-3.5 text-sm sm:h-9 transition-colors',
               value === o ? 'border-ink bg-ink font-semibold text-paper' : 'border-line bg-surface text-ink-soft hover:border-line-strong',
             )}
           >

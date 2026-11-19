@@ -128,7 +128,7 @@ function MembersInner() {
                       disabled={me}
                       onClick={() => changeRole(m, m.role === 'admin' ? 'member' : 'admin')}
                       title={me ? '자기 권한은 바꿀 수 없어요' : '눌러서 권한 전환'}
-                      className={cx('h-8 rounded-full px-3 text-xs font-semibold disabled:cursor-not-allowed', m.role === 'admin' ? 'bg-accent-soft text-accent-strong' : 'bg-sunken text-ink-soft hover:bg-line')}
+                      className={cx('h-10 rounded-full px-3.5 text-xs font-semibold disabled:cursor-not-allowed', m.role === 'admin' ? 'bg-accent-soft text-accent-strong' : 'bg-sunken text-ink-soft hover:bg-line')}
                     >
                       {m.role === 'admin' ? '운영진' : '부원'}
                     </button>
@@ -138,7 +138,7 @@ function MembersInner() {
                         <Button size="sm" variant="accent" onClick={() => remove(m.email)}>빼기</Button>
                       </span>
                     ) : (
-                      <button type="button" disabled={me} onClick={() => setPendingDelete(m.email)} aria-label={`${m.email} 명단에서 빼기`} className="grid size-9 place-items-center rounded-full text-muted hover:bg-sunken hover:text-accent disabled:invisible">
+                      <button type="button" disabled={me} onClick={() => setPendingDelete(m.email)} aria-label={`${m.email} 명단에서 빼기`} className="grid size-11 place-items-center rounded-full text-muted hover:bg-sunken hover:text-accent disabled:invisible">
                         <Trash2 size={16} />
                       </button>
                     )}

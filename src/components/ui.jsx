@@ -15,7 +15,7 @@ const BUTTON = {
 export function Button({ variant = 'primary', size = 'md', to, className, children, ...rest }) {
   const cls = cx(
     'inline-flex items-center justify-center gap-1.5 rounded-full font-semibold transition-colors disabled:opacity-50 disabled:pointer-events-none select-none',
-    size === 'sm' ? 'h-9 px-3.5 text-sm' : size === 'lg' ? 'h-13 px-6 text-base' : 'h-11 px-5 text-[0.95rem]',
+    size === 'sm' ? 'h-11 px-4 text-sm sm:h-9 sm:px-3.5' : size === 'lg' ? 'h-13 px-6 text-base' : 'h-11 px-5 text-[0.95rem]',
     BUTTON[variant],
     className,
   );
@@ -34,7 +34,7 @@ export function Card({ as: Tag = 'div', className, children, ...rest }) {
 export function FlavorChip({ name, selected, onClick, size = 'md' }) {
   const base = cx(
     'inline-flex items-center gap-1.5 rounded-full border transition-colors',
-    size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-3 py-1.5 text-sm',
+    size === 'sm' ? 'px-2 py-0.5 text-xs' : 'min-h-11 px-3.5 py-1.5 text-sm sm:min-h-9',
   );
   const dot = <span aria-hidden className="size-1.5 rounded-full shrink-0" style={{ background: flavorDot(name) }} />;
   if (!onClick) {
@@ -74,7 +74,7 @@ export function Stars({ value, size = 16 }) {
         const fill = Math.max(0, Math.min(1, value - (i - 1)));
         return (
           <span key={i} className="relative inline-block" style={{ width: size, height: size }}>
-            <Star size={size} className="absolute inset-0 text-line-strong" strokeWidth={1.6} />
+            <Star size={size} className="absolute inset-0 text-outline" strokeWidth={1.6} />
             {fill > 0 && (
               <span className="absolute inset-0 overflow-hidden" style={{ width: `${fill * 100}%` }}>
                 <Star size={size} className="text-accent fill-accent" strokeWidth={1.6} />
@@ -110,7 +110,7 @@ export function StarInput({ value, onChange }) {
           const fill = Math.max(0, Math.min(1, value - (i - 1)));
           return (
             <span key={i} className="relative inline-block size-10">
-              <Star size={36} className="absolute inset-0.5 text-line-strong" strokeWidth={1.4} />
+              <Star size={36} className="absolute inset-0.5 text-outline" strokeWidth={1.4} />
               {fill > 0 && (
                 <span className="absolute inset-0.5 overflow-hidden" style={{ width: `${fill * 36}px` }}>
                   <Star size={36} className="text-accent fill-accent" strokeWidth={1.4} />
@@ -144,7 +144,7 @@ export function ScaleInput({ label, low, high, value, onChange }) {
             aria-label={`${label} ${n}단계`}
             onClick={() => onChange(n)}
             className={cx(
-              'h-11 rounded-xl border text-sm font-semibold tnum transition-colors',
+              'h-11 rounded-xl border text-sm font-semibold tnum transition-colors duration-150',
               value === n ? 'border-ink bg-ink text-paper' : n <= value ? 'border-line-strong bg-sunken text-ink' : 'border-line bg-surface text-muted hover:border-line-strong',
             )}
           >
@@ -212,7 +212,7 @@ export function Segmented({ options, value, onChange, label }) {
           aria-checked={value === o.value}
           onClick={() => onChange(o.value)}
           className={cx(
-            'h-9 rounded-full px-4 text-sm font-semibold transition-colors',
+            'h-10 rounded-full px-4 text-sm font-semibold transition-colors',
             value === o.value ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink',
           )}
         >

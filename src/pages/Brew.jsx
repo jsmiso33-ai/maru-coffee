@@ -122,7 +122,7 @@ export default function Brew() {
                     type="button"
                     aria-pressed={method === p.method}
                     onClick={() => choose(p.method)}
-                    className={cx('h-9 rounded-full border px-3.5 text-sm', method === p.method ? 'border-ink bg-ink font-semibold text-paper' : 'border-line bg-surface text-ink-soft hover:border-line-strong')}
+                    className={cx('h-11 rounded-full border px-3.5 text-sm sm:h-9', method === p.method ? 'border-ink bg-ink font-semibold text-paper' : 'border-line bg-surface text-ink-soft hover:border-line-strong')}
                   >
                     {p.method}
                   </button>
@@ -223,8 +223,8 @@ function Stepper({ label, value, onChange, min, max, step, format }) {
       <div className="flex items-center gap-2">
         <span className="text-sm font-semibold tnum">{format(value)}</span>
         <div className="flex">
-          <button type="button" aria-label={`${label} 줄이기`} disabled={value <= min} onClick={() => onChange(round1(value - step))} className="grid size-9 place-items-center rounded-l-full border border-line hover:bg-sunken disabled:opacity-40"><Minus size={14} /></button>
-          <button type="button" aria-label={`${label} 늘리기`} disabled={value >= max} onClick={() => onChange(round1(value + step))} className="grid size-9 place-items-center rounded-r-full border border-l-0 border-line hover:bg-sunken disabled:opacity-40"><Plus size={14} /></button>
+          <button type="button" aria-label={`${label} 줄이기`} disabled={value <= min} onClick={() => onChange(round1(value - step))} className="grid size-11 place-items-center rounded-l-full border border-line hover:bg-sunken disabled:opacity-40"><Minus size={14} /></button>
+          <button type="button" aria-label={`${label} 늘리기`} disabled={value >= max} onClick={() => onChange(round1(value + step))} className="grid size-11 place-items-center rounded-r-full border border-l-0 border-line hover:bg-sunken disabled:opacity-40"><Plus size={14} /></button>
         </div>
       </div>
     </div>

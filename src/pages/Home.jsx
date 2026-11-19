@@ -39,7 +39,7 @@ export default function Home() {
           </div>
         </div>
 
-        <Card className="p-6 sm:p-7">
+        <Card className="min-h-[15.5rem] p-6 sm:p-7">
           <p className="text-sm font-semibold text-muted">지금까지 마루가 마신 커피</p>
           {stats ? (
             <>

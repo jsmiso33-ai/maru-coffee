@@ -7,7 +7,7 @@ import { useAuth } from '../lib/auth.jsx';
 import { Avatar, Button, Card, Notice, Spinner } from '../components/ui.jsx';
 import BrewTimer from '../components/BrewTimer.jsx';
 import { formatDuration, mmss, ratioOf, round1 } from '../lib/format.js';
-import { NotFound } from './NoteDetail.jsx';
+import { NotFound } from './NotFound.jsx';
 
 export default function RecipeDetail({ standard = false }) {
   const { id } = useParams();

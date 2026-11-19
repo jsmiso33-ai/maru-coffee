@@ -7,7 +7,7 @@ import { BREW_METHODS } from '../data/options.js';
 import { Button, Card, Label, Notice, Spinner, cx } from '../components/ui.jsx';
 import MemberGate from '../components/MemberGate.jsx';
 import { mmss, parseTime, ratioOf } from '../lib/format.js';
-import { NotFound } from './NoteDetail.jsx';
+import { NotFound } from './NotFound.jsx';
 
 const EMPTY = {
   title: '', method: 'V60', dose_g: '15', water_g: '250', water_temp: '93', grind: '', total_time: '3:00',
@@ -150,7 +150,7 @@ function RecipeFormInner() {
                   type="button"
                   aria-pressed={form.method === m}
                   onClick={() => setForm((f) => ({ ...f, method: m }))}
-                  className={cx('h-9 rounded-full border px-3.5 text-sm', form.method === m ? 'border-ink bg-ink font-semibold text-paper' : 'border-line bg-surface text-ink-soft hover:border-line-strong')}
+                  className={cx('h-11 rounded-full border px-3.5 text-sm sm:h-9', form.method === m ? 'border-ink bg-ink font-semibold text-paper' : 'border-line bg-surface text-ink-soft hover:border-line-strong')}
                 >
                   {m}
                 </button>

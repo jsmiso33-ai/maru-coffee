@@ -71,13 +71,13 @@ export default function Notes() {
               type="button"
               aria-pressed={mine}
               onClick={() => update('mine', mine ? '' : '1')}
-              className={cx('h-10 rounded-full border px-4 text-sm font-semibold', mine ? 'border-ink bg-ink text-paper' : 'border-line bg-surface text-ink-soft hover:border-line-strong')}
+              className={cx('h-11 rounded-full border px-4 text-sm font-semibold sm:h-10', mine ? 'border-ink bg-ink text-paper' : 'border-line bg-surface text-ink-soft hover:border-line-strong')}
             >
               내 노트
             </button>
           )}
           {hasFilter && (
-            <button type="button" onClick={() => setParams({}, { replace: true })} className="inline-flex h-10 items-center gap-1 px-2 text-sm text-muted hover:text-ink">
+            <button type="button" onClick={() => setParams({}, { replace: true })} className="inline-flex h-11 items-center gap-1 px-2 text-sm text-muted hover:text-ink sm:h-10">
               <X size={15} /> 초기화
             </button>
           )}
@@ -114,7 +114,7 @@ export default function Notes() {
   );
 }
 
-const CHEVRON = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="#7a6c61" stroke-width="2"><path d="m2 4 4 4 4-4"/></svg>')}")`;
+const CHEVRON = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="#6f6258" stroke-width="2"><path d="m2 4 4 4 4-4"/></svg>')}")`;
 
 function FilterSelect({ label, value, onChange, options }) {
   return (
@@ -123,7 +123,7 @@ function FilterSelect({ label, value, onChange, options }) {
       value={value}
       onChange={(e) => onChange(e.target.value)}
       className={cx(
-        'h-10 cursor-pointer appearance-none rounded-full border bg-surface pl-4 pr-9 text-sm font-semibold',
+        'h-11 cursor-pointer appearance-none sm:h-10 rounded-full border bg-surface pl-4 pr-9 text-sm font-semibold',
         'bg-[position:right_0.85rem_center] bg-no-repeat',
         value ? 'border-ink text-ink' : 'border-line text-ink-soft',
       )}

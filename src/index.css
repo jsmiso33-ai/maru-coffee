@@ -12,7 +12,8 @@
   --color-line-strong: #cbbba4;
   --color-ink: #2a1f1a;
   --color-ink-soft: #4a3d35;
-  --color-muted: #7a6c61;
+  --color-muted: #6f6258; /* sunken 위에서도 4.5:1 이상 */
+  --color-outline: #9d8a73; /* 빈 별 등 그래픽 윤곽선 (3:1) */
   --color-accent: #8e2433;
   --color-accent-strong: #741a28;
   --color-accent-soft: #f3e0dc;
@@ -43,6 +44,15 @@ body {
   background: var(--color-accent-soft);
 }
 
+/* Tailwind v4 프리플라이트는 버튼 커서를 default로 둔다 */
+button:not(:disabled),
+[role='button']:not([aria-disabled='true']),
+[role='slider'],
+select,
+summary {
+  cursor: pointer;
+}
+
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
@@ -65,7 +75,7 @@ body {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .field::placeholder {
-  color: #a99b8e;
+  color: #857769;
 }
 .field:focus {
   outline: none;
