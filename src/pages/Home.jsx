@@ -1,12 +1,14 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router';
-import { ArrowRight, Timer, NotebookPen, Calculator } from 'lucide-react';
+import { ArrowRight, Timer, NotebookPen, Calculator, Clock, MapPin, Plus } from 'lucide-react';
 import { CLUB } from '../lib/config.js';
-import { listNotes, useAsync } from '../lib/db.js';
+import { listActivities, listNotes, useAsync } from '../lib/db.js';
+import { useAuth } from '../lib/auth.jsx';
+import { DDay } from '../components/ActivityBits.jsx';
 import { STANDARD_RECIPES } from '../data/recipes.js';
 import { Button, Card, FlavorChip, Spinner } from '../components/ui.jsx';
 import NoteCard from '../components/NoteCard.jsx';
-import { formatDuration, ratioOf } from '../lib/format.js';
+import { formatClock, formatDay, formatDuration, ratioOf, todayKey } from '../lib/format.js';
 
 export default function Home() {
   const { data: notes, loading } = useAsync(listNotes, []);
@@ -70,6 +72,8 @@ export default function Home() {
         </Card>
       </section>
 
+      <NextActivity />
+
       {/* 최근 노트 */}
       <section>
         <SectionHead title="최근 테이스팅 노트" to="/notes" link="전체 보기" />
@@ -124,5 +128,60 @@ function SectionHead({ title, to, link }) {
         {link} <ArrowRight size={15} />
       </Link>
     </div>
+  );
+}
+
+// 다가오는 활동이 있으면 그걸, 없으면 가장 최근 활동을 보여 준다
+function NextActivity() {
+  const { isAdmin } = useAuth();
+  const { data } = useAsync(listActivities, []);
+  if (!data) return null;
+  const today = todayKey();
+  const upcoming = data.filter((a) => a.held_on >= today).sort((a, b) => a.held_on.localeCompare(b.held_on));
+  const activity = upcoming[0] ?? data[0];
+
+  if (!activity) {
+    if (!isAdmin) return null;
+    return (
+      <section>
+        <SectionHead title="활동" to="/activities" link="캘린더" />
+        <Card className="flex flex-wrap items-center justify-between gap-4 px-6 py-6">
+          <p className="text-ink-soft">첫 활동을 등록하면 여기와 캘린더에 표시돼요.</p>
+          <Button to="/activities/new" size="sm"><Plus size={15} /> 활동 만들기</Button>
+        </Card>
+      </section>
+    );
+  }
+
+  const isUpcoming = activity.held_on >= today;
+  return (
+    <section>
+      <SectionHead title={isUpcoming ? '다음 활동' : '최근 활동'} to="/activities" link="캘린더" />
+      <Link
+        to={`/activities/${activity.id}`}
+        className="group grid gap-5 rounded-[var(--radius-card)] bg-ink p-6 text-paper transition-colors hover:bg-ink-soft sm:p-8 md:grid-cols-[1fr_auto] md:items-end"
+      >
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="rounded-full bg-paper/15 px-2.5 py-0.5 text-xs font-semibold">{activity.kind}</span>
+            <DDay date={activity.held_on} />
+          </div>
+          <h3 className="mt-3 text-2xl font-bold leading-snug sm:text-3xl">{activity.title}</h3>
+          <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-paper/75">
+            <span className="font-semibold text-paper">{formatDay(activity.held_on)}</span>
+            {activity.start_time && <span className="inline-flex items-center gap-1.5"><Clock size={15} />{formatClock(activity.start_time)}</span>}
+            {activity.place && <span className="inline-flex items-center gap-1.5"><MapPin size={15} />{activity.place}</span>}
+          </p>
+          {activity.beans?.length > 0 && (
+            <p className="mt-4 text-sm text-paper/70">
+              <span className="text-crema">원두 {activity.beans.length}종</span> · {activity.beans.map((b) => b.name).join(', ')}
+            </p>
+          )}
+        </div>
+        <span className="inline-flex items-center gap-1 font-semibold text-crema">
+          {isUpcoming ? '자세히 보기' : '노트 보러 가기'} <ArrowRight size={16} className="transition group-hover:translate-x-0.5" />
+        </span>
+      </Link>
+    </section>
   );
 }

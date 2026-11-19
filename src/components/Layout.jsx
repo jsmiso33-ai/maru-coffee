@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
-import { House, NotebookPen, BookOpen, Timer, LogOut, Users, Eye } from 'lucide-react';
+import { House, CalendarDays, NotebookPen, BookOpen, Timer, LogOut, Users, Eye } from 'lucide-react';
 import { useAuth } from '../lib/auth.jsx';
 import { isConfigured } from '../lib/supabase.js';
 import { CLUB } from '../lib/config.js';
@@ -8,6 +8,7 @@ import { Avatar, Notice, Spinner, cx } from './ui.jsx';
 
 const NAV = [
   { to: '/', label: '홈', icon: House, end: true },
+  { to: '/activities', label: '활동', icon: CalendarDays },
   { to: '/notes', label: '테이스팅 노트', short: '노트', icon: NotebookPen },
   { to: '/recipes', label: '레시피', icon: BookOpen },
   { to: '/brew', label: '계산기·타이머', short: '브루잉', icon: Timer },
@@ -152,14 +153,14 @@ export default function Layout() {
 
       {/* 모바일 하단 탭 — 브루잉 중 한 손으로 이동 */}
       <nav aria-label="주요 메뉴" className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
-        <ul className="grid grid-cols-4">
+        <ul className="grid grid-cols-5">
           {NAV.map(({ to, label, short, icon: Icon, end }) => (
             <li key={to}>
               <NavLink
                 to={to}
                 end={end}
                 className={({ isActive }) => cx(
-                  'flex h-[4.25rem] flex-col items-center justify-center gap-1 text-[0.72rem] font-semibold',
+                  'flex h-[4.25rem] flex-col items-center justify-center gap-1 text-xs font-semibold',
                   isActive ? 'text-accent' : 'text-muted',
                 )}
               >

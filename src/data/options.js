@@ -13,3 +13,5 @@ export const ATTRIBUTES = [
   { key: 'bitterness', label: '쓴맛', low: '적음', high: '강함' },
   { key: 'aftertaste', label: '여운', low: '짧음', high: '길게 남음' },
 ];
+
+export const ACTIVITY_KINDS = ['정기 모임', '커핑', '브루잉 실습', '카페 투어', '기타'];

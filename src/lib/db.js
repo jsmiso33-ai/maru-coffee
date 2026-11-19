@@ -6,6 +6,7 @@ import { SAMPLE_NOTES } from '../data/sampleNotes.js';
 const NOTE_FIELDS = [
   'bean_name', 'roaster', 'origin', 'process', 'roast_level', 'brew_method', 'tasted_on',
   'flavors', 'acidity', 'sweetness', 'body', 'bitterness', 'aftertaste', 'rating', 'memo',
+  'activity_id', 'activity_bean_id',
 ];
 const RECIPE_FIELDS = [
   'title', 'method', 'dose_g', 'water_g', 'water_temp', 'grind', 'total_time_s', 'steps', 'bean_hint', 'memo',
@@ -49,6 +50,60 @@ export async function saveNote(note, id) {
 
 export async function deleteNote(id) {
   unwrap(await supabase.from('tasting_notes').delete().eq('id', id));
+}
+
+export async function listNotesForActivity(activityId) {
+  if (!supabase) return [];
+  return unwrap(await supabase.from('tasting_notes').select('*').eq('activity_id', activityId).order('created_at', { ascending: true }));
+}
+
+// ───── 활동 (일자별 모임) ─────
+const ACTIVITY_FIELDS = ['title', 'kind', 'held_on', 'start_time', 'place', 'description', 'prep'];
+const BEAN_FIELDS = ['name', 'roaster', 'origin', 'process', 'roast_level'];
+const ACTIVITY_SELECT = '*, beans:activity_beans(*)';
+
+function sortBeans(a) {
+  if (a?.beans) a.beans.sort((x, y) => x.sort - y.sort);
+  return a;
+}
+
+export async function listActivities() {
+  if (!supabase) return [];
+  const rows = unwrap(await supabase.from('activities').select(ACTIVITY_SELECT).order('held_on', { ascending: false }).limit(500));
+  return rows.map(sortBeans);
+}
+
+export async function getActivity(id) {
+  if (!supabase) return null;
+  return sortBeans(unwrap(await supabase.from('activities').select(ACTIVITY_SELECT).eq('id', id).maybeSingle()));
+}
+
+// 활동 본문 저장 후 원두 목록을 맞춘다: 남은 원두는 수정, 빠진 원두는 삭제, 새 원두는 추가.
+// 원두 id를 유지해야 거기에 연결된 노트가 끊기지 않는다.
+export async function saveActivity(activity, beans, id) {
+  const row = pick(activity, ACTIVITY_FIELDS);
+  const saved = unwrap(await (id
+    ? supabase.from('activities').update(row).eq('id', id)
+    : supabase.from('activities').insert(row)
+  ).select().single());
+
+  const keep = beans.filter((b) => b.id).map((b) => b.id);
+  if (id) {
+    let del = supabase.from('activity_beans').delete().eq('activity_id', saved.id);
+    if (keep.length) del = del.not('id', 'in', `(${keep.join(',')})`);
+    unwrap(await del);
+  }
+  for (const [i, b] of beans.entries()) {
+    const data = { ...pick(b, BEAN_FIELDS), sort: i, activity_id: saved.id };
+    unwrap(await (b.id
+      ? supabase.from('activity_beans').update(data).eq('id', b.id)
+      : supabase.from('activity_beans').insert(data)));
+  }
+  return saved;
+}
+
+export async function deleteActivity(id) {
+  unwrap(await supabase.from('activities').delete().eq('id', id));
 }
 
 // ───── 부원 레시피 ─────

@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router';
-import { ArrowLeft, Plus } from 'lucide-react';
-import { getNote, saveNote } from '../lib/db.js';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
+import { ArrowLeft, CalendarDays, Plus } from 'lucide-react';
+import { getNote, listActivities, saveNote } from '../lib/db.js';
+import { daysUntil, formatDay } from '../lib/format.js';
 import { useAuth } from '../lib/auth.jsx';
 import { ATTRIBUTES, BREW_METHODS, ORIGINS, PROCESSES, ROAST_LEVELS } from '../data/options.js';
 import { FLAVOR_GROUPS } from '../data/flavors.js';
@@ -20,7 +21,7 @@ function today() {
 const EMPTY = {
   bean_name: '', roaster: '', origin: '', process: '', roast_level: '', brew_method: '',
   tasted_on: today(), flavors: [], acidity: 3, sweetness: 3, body: 3, bitterness: 3, aftertaste: 3,
-  rating: 3.5, memo: '',
+  rating: 3.5, memo: '', activity_id: '', activity_bean_id: '',
 };
 
 export default function NoteForm() {
@@ -42,6 +43,26 @@ function NoteFormInner() {
   const [error, setError] = useState('');
   const [touched, setTouched] = useState(false);
   const [customFlavor, setCustomFlavor] = useState('');
+  const [params] = useSearchParams();
+  const [activities, setActivities] = useState([]);
+  const prefilled = useRef(false);
+
+  // 노트를 연결할 수 있는 활동: 최근 120일 ~ 일주일 뒤
+  useEffect(() => {
+    listActivities()
+      .then((all) => setActivities(all.filter((a) => daysUntil(a.held_on) >= -120 && daysUntil(a.held_on) <= 7)))
+      .catch(() => setActivities([]));
+  }, []);
+
+  // 활동 페이지의 "이 원두 노트 쓰기"로 들어오면(?activity=&bean=) 원두 정보를 미리 채운다
+  useEffect(() => {
+    if (id || prefilled.current || !activities.length) return;
+    const activity = activities.find((a) => a.id === params.get('activity'));
+    if (!activity) return;
+    prefilled.current = true;
+    const bean = activity.beans?.find((b) => b.id === params.get('bean'));
+    setForm((f) => applyActivity(f, activity, bean));
+  }, [activities, id, params]);
 
   useEffect(() => {
     if (!id) return;
@@ -74,6 +95,13 @@ function NoteFormInner() {
     setCustomFlavor('');
   };
 
+  const linked = activities.find((a) => a.id === form.activity_id);
+  const chooseActivity = (activityId) => {
+    const activity = activities.find((a) => a.id === activityId);
+    setForm((f) => (activity ? applyActivity(f, activity, null) : { ...f, activity_id: '', activity_bean_id: '' }));
+  };
+  const chooseBean = (bean) => setForm((f) => applyActivity(f, linked, bean));
+
   const allPreset = new Set(FLAVOR_GROUPS.flatMap((g) => g.items));
   const customSelected = form.flavors.filter((f) => !allPreset.has(f));
   const beanMissing = !form.bean_name.trim();
@@ -104,6 +132,55 @@ function NoteFormInner() {
       <h1 className="mb-8 text-3xl font-bold tracking-tight">{id ? '노트 수정' : '테이스팅 노트 쓰기'}</h1>
 
       <div className="space-y-5">
+        {(activities.length > 0 || form.activity_id) && (
+          <Card className="p-5 sm:p-6">
+            <h2 className="flex items-center gap-2 text-lg font-bold"><CalendarDays size={20} /> 활동에서 마셨나요</h2>
+            <p className="mt-1 text-sm text-muted">활동을 고르면 그날 원두 목록에서 바로 고를 수 있고, 활동 페이지에 원두별로 모여요.</p>
+            <select
+              aria-label="연결할 활동"
+              value={form.activity_id}
+              onChange={(e) => chooseActivity(e.target.value)}
+              className="field mt-4"
+            >
+              <option value="">활동과 상관없이 마신 커피</option>
+              {linked == null && form.activity_id && <option value={form.activity_id}>연결된 활동</option>}
+              {activities.map((a) => <option key={a.id} value={a.id}>{formatDay(a.held_on)} · {a.title}</option>)}
+            </select>
+            {linked?.beans?.length > 0 && (
+              <div className="mt-4">
+                <p className="mb-2 text-sm font-semibold">어떤 원두였나요</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {linked.beans.map((b, i) => (
+                    <button
+                      key={b.id}
+                      type="button"
+                      aria-pressed={form.activity_bean_id === b.id}
+                      onClick={() => chooseBean(b)}
+                      className={cx(
+                        'inline-flex min-h-11 items-center gap-2 rounded-full border px-3.5 text-sm sm:min-h-9',
+                        form.activity_bean_id === b.id ? 'border-ink bg-ink font-semibold text-paper' : 'border-line bg-surface text-ink-soft hover:border-line-strong',
+                      )}
+                    >
+                      <span className="font-display tnum opacity-70">{i + 1}</span>{b.name}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    aria-pressed={!form.activity_bean_id}
+                    onClick={() => setForm((f) => ({ ...f, activity_bean_id: '' }))}
+                    className={cx(
+                      'min-h-11 rounded-full border px-3.5 text-sm sm:min-h-9',
+                      !form.activity_bean_id ? 'border-ink bg-ink font-semibold text-paper' : 'border-line bg-surface text-ink-soft hover:border-line-strong',
+                    )}
+                  >
+                    목록에 없는 원두
+                  </button>
+                </div>
+              </div>
+            )}
+          </Card>
+        )}
+
         <Card className="space-y-5 p-5 sm:p-6">
           <SectionTitle n="1">어떤 커피였나요</SectionTitle>
           <div>
@@ -212,6 +289,20 @@ function NoteFormInner() {
       </div>
     </form>
   );
+}
+
+// 활동(과 원두)을 고르면 마신 날과 원두 정보를 채운다. 사용자가 이미 적은 값은 원두를 고를 때만 덮어쓴다.
+function applyActivity(form, activity, bean) {
+  const next = { ...form, activity_id: activity.id, activity_bean_id: bean?.id ?? '' };
+  if (activity.held_on <= today()) next.tasted_on = activity.held_on;
+  if (bean) {
+    next.bean_name = bean.name;
+    next.roaster = bean.roaster ?? '';
+    next.origin = bean.origin ?? '';
+    next.process = bean.process ?? '';
+    next.roast_level = bean.roast_level ?? '';
+  }
+  return next;
 }
 
 function SectionTitle({ n, children }) {

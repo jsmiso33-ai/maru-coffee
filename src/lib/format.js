@@ -38,3 +38,47 @@ export function ratioOf(dose, water) {
   if (!dose || !water) return null;
   return round1(water / dose);
 }
+
+// ───── 날짜 (활동은 'YYYY-MM-DD' 문자열, 로컬 날짜 기준) ─────
+const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
+
+export function toDateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+export function todayKey() {
+  return toDateKey(new Date());
+}
+
+export function parseDateKey(key) {
+  const [y, m, d] = key.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+// "11월 27일 (목)"
+export function formatDay(key, { year = false } = {}) {
+  const d = parseDateKey(key);
+  return `${year ? `${d.getFullYear()}년 ` : ''}${d.getMonth() + 1}월 ${d.getDate()}일 (${WEEKDAYS[d.getDay()]})`;
+}
+
+// "19:00" → "오후 7시", "13:30" → "오후 1시 30분"
+export function formatClock(time) {
+  if (!time) return '';
+  const [h, m] = time.split(':').map(Number);
+  const ampm = h < 12 ? '오전' : '오후';
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${ampm} ${h12}시${m ? ` ${m}분` : ''}`;
+}
+
+// 오늘 기준 며칠 남았는지: 0 = 오늘, 음수 = 지난 날
+export function daysUntil(key) {
+  const ms = parseDateKey(key) - parseDateKey(todayKey());
+  return Math.round(ms / 86400000);
+}
+
+export function dDayLabel(key) {
+  const n = daysUntil(key);
+  if (n === 0) return '오늘';
+  if (n === 1) return '내일';
+  return n > 0 ? `D-${n}` : `${-n}일 전`;
+}

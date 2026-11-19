@@ -1,19 +1,23 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
-import { deleteNote, getNote, useAsync } from '../lib/db.js';
+import { ArrowLeft, CalendarDays, ChevronRight, Pencil, Trash2 } from 'lucide-react';
+import { deleteNote, getActivity, getNote, useAsync } from '../lib/db.js';
 import { useAuth } from '../lib/auth.jsx';
 import { ATTRIBUTES } from '../data/options.js';
 import { Avatar, Button, Card, FlavorChip, Notice, Spinner, Stars } from '../components/ui.jsx';
 import { NotFound } from './NotFound.jsx';
 import RadarChart from '../components/RadarChart.jsx';
-import { formatDate } from '../lib/format.js';
+import { formatDate, formatDay } from '../lib/format.js';
 
 export default function NoteDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
   const { data: note, loading, error } = useAsync(() => getNote(id), [id]);
+  const { data: activity } = useAsync(
+    () => (note?.activity_id ? getActivity(note.activity_id) : Promise.resolve(null)),
+    [note?.activity_id],
+  );
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState('');
@@ -65,6 +69,21 @@ export default function NoteDetail() {
           </span>
         </div>
       </header>
+
+      {activity && (
+        <Link
+          to={`/activities/${activity.id}`}
+          className="mt-6 flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-sm transition-colors hover:border-line-strong"
+        >
+          <CalendarDays size={18} className="shrink-0 text-accent" />
+          <span className="min-w-0 flex-1">
+            <span className="text-muted">{formatDay(activity.held_on)} · </span>
+            <strong className="font-semibold">{activity.title}</strong>
+            <span className="text-muted">에서 마신 원두</span>
+          </span>
+          <ChevronRight size={16} className="shrink-0 text-muted" />
+        </Link>
+      )}
 
       <div className="mt-8 grid gap-5 md:grid-cols-[1fr_1.15fr]">
         <Card className="flex flex-col items-center p-5">

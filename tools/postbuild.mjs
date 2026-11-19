@@ -4,7 +4,7 @@
 //   — 구글 OAuth 동의 화면 검사처럼 상태 코드를 보는 크롤러를 위해.
 import { copyFileSync, mkdirSync } from 'node:fs';
 
-const STATIC_ROUTES = ['privacy', 'notes', 'recipes', 'brew'];
+const STATIC_ROUTES = ['privacy', 'activities', 'notes', 'recipes', 'brew'];
 
 copyFileSync('dist/index.html', 'dist/404.html');
 for (const route of STATIC_ROUTES) {

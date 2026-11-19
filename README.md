@@ -3,6 +3,7 @@
 부원용 웹사이트. Vite + React 19 + Tailwind v4 + Supabase(구글 로그인), GitHub Pages 배포.
 
 ## 기능
+- **활동** — 운영진이 일자별 모임(날짜·시간·장소·준비물·마실 원두)을 등록, 월간 캘린더 + 다가오는/지난 활동 목록, 활동별로 원두마다 부원 노트 평균(별점·맛 프로필·향미) 비교
 - **테이스팅 노트** — 원두·산지·가공·로스팅·추출, 5개 감각 항목(산미·단맛·바디·쓴맛·여운) 레이더 차트, 향미 태그, 반 별점, 검색·필터
 - **브루잉 레시피** — MARU 표준 레시피 8종 + 부원 레시피 공유, 원두 양에 맞춰 자동 스케일링
 - **계산기·타이머** — 비율 계산(물↔원두 양방향), 뜸·나눠 붓기 스케줄 자동 생성, 단계별 알림음·진동, 화면 꺼짐 방지
@@ -22,6 +23,7 @@ npm run dev            # http://localhost:5180
 ## Supabase 설정 (최초 1회)
 1. [supabase.com](https://supabase.com)에서 새 프로젝트 생성
 2. SQL Editor에 `supabase/schema.sql` 붙여넣기 → 맨 아래 이메일을 **회장 본인 구글 이메일**로 바꾸고 Run
+   - 이어서 `supabase/migrations/` 안의 파일을 번호 순서대로 하나씩 붙여넣고 Run (여러 번 실행해도 안전)
 3. Authentication → Sign In / Providers → **Google** 활성화
    - Google Cloud Console → API 및 서비스 → 사용자 인증 정보 → OAuth 클라이언트 ID(웹) 생성
    - 승인된 리디렉션 URI: `https://<프로젝트ref>.supabase.co/auth/v1/callback`
