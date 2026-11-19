@@ -5,16 +5,32 @@ import './index.css';
 import { AuthProvider } from './lib/auth.jsx';
 import Layout from './components/Layout.jsx';
 import Home from './pages/Home.jsx';
-const Notes = lazy(() => import('./pages/Notes.jsx'));
+// 배포 직후엔 브라우저에 캐시된 옛 HTML이 지워진 청크를 찾다 실패할 수 있다 → 한 번만 새로고침
+function page(load) {
+  return lazy(() => load().then((mod) => {
+    try { sessionStorage.removeItem('maru-chunk-reload'); } catch { /* noop */ }
+    return mod;
+  }, (err) => {
+    try {
+      if (!sessionStorage.getItem('maru-chunk-reload')) {
+        sessionStorage.setItem('maru-chunk-reload', '1');
+        window.location.reload();
+        return new Promise(() => {});
+      }
+    } catch { /* storage 차단 시 그대로 오류 표시 */ }
+    throw err;
+  }));
+}
+const Notes = page(() => import('./pages/Notes.jsx'));
 import { NotFound } from './pages/NotFound.jsx';
-const NoteDetail = lazy(() => import('./pages/NoteDetail.jsx'));
-const NoteForm = lazy(() => import('./pages/NoteForm.jsx'));
-const Recipes = lazy(() => import('./pages/Recipes.jsx'));
-const RecipeDetail = lazy(() => import('./pages/RecipeDetail.jsx'));
-const RecipeForm = lazy(() => import('./pages/RecipeForm.jsx'));
-const Brew = lazy(() => import('./pages/Brew.jsx'));
-const Members = lazy(() => import('./pages/Members.jsx'));
-const Privacy = lazy(() => import('./pages/Privacy.jsx'));
+const NoteDetail = page(() => import('./pages/NoteDetail.jsx'));
+const NoteForm = page(() => import('./pages/NoteForm.jsx'));
+const Recipes = page(() => import('./pages/Recipes.jsx'));
+const RecipeDetail = page(() => import('./pages/RecipeDetail.jsx'));
+const RecipeForm = page(() => import('./pages/RecipeForm.jsx'));
+const Brew = page(() => import('./pages/Brew.jsx'));
+const Members = page(() => import('./pages/Members.jsx'));
+const Privacy = page(() => import('./pages/Privacy.jsx'));
 
 // GitHub Pages는 SPA 라우팅을 모르므로 빌드 후 tools/postbuild.mjs가 index.html을 404.html 등으로 복사한다.
 createRoot(document.getElementById('root')).render(
