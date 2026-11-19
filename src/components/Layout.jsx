@@ -15,7 +15,7 @@ const NAV = [
 
 function Wordmark() {
   return (
-    <Link to="/" className="group flex items-baseline gap-2" aria-label={`${CLUB.name} 홈`}>
+    <Link to="/" className="group flex items-baseline gap-2 py-2.5" aria-label={`${CLUB.name} 홈`}>
       <span className="font-display text-[1.6rem] font-semibold leading-none tracking-[-0.02em]">{CLUB.name}</span>
       <span className="hidden text-xs font-medium text-muted sm:inline">{CLUB.tagline}</span>
     </Link>
@@ -76,7 +76,7 @@ function AuthArea() {
   if (loading && !user) return <span className="h-10 w-24" />;
   if (user) return <AccountMenu />;
   return (
-    <button type="button" onClick={signIn} className="inline-flex h-10 items-center gap-2 rounded-full border border-line-strong bg-surface px-4 text-sm font-semibold transition-colors hover:bg-sunken">
+    <button type="button" onClick={signIn} className="inline-flex h-11 items-center gap-2 rounded-full border border-line-strong bg-surface px-4 text-sm font-semibold transition-colors hover:bg-sunken">
       <GoogleMark /> 로그인
     </button>
   );
@@ -143,9 +143,9 @@ export default function Layout() {
           <p><span className="font-display font-semibold text-ink">{CLUB.name}</span> · {CLUB.school} {CLUB.tagline}</p>
           <div className="flex items-center gap-4">
             {CLUB.instagram && (
-              <a href={`https://instagram.com/${CLUB.instagram}`} target="_blank" rel="noreferrer" className="hover:text-ink">@{CLUB.instagram}</a>
+              <a href={`https://instagram.com/${CLUB.instagram}`} target="_blank" rel="noreferrer" className="-my-3 py-3 hover:text-ink">@{CLUB.instagram}</a>
             )}
-            <Link to="/privacy" className="hover:text-ink">개인정보처리방침</Link>
+            <Link to="/privacy" className="-my-3 py-3 hover:text-ink">개인정보처리방침</Link>
           </div>
         </div>
       </footer>

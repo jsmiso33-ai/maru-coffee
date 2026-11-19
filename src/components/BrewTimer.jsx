@@ -131,7 +131,7 @@ export default function BrewTimer({ steps, total, water }) {
             type="button"
             onClick={() => setSound((s) => !s)}
             aria-label={sound ? '알림음 끄기' : '알림음 켜기'}
-            className="grid size-10 place-items-center rounded-full text-paper/70 hover:bg-paper/10"
+            className="-mr-2 -mt-1 grid size-11 place-items-center rounded-full text-paper/70 hover:bg-paper/10"
           >
             {sound ? <Volume2 size={18} /> : <VolumeX size={18} />}
           </button>
