@@ -1,0 +1,49 @@
+name: Deploy to GitHub Pages
+
+# main에 푸시하면 빌드해서 GitHub Pages에 배포한다.
+# 저장소 Settings → Pages → Source 를 "GitHub Actions"로 설정할 것.
+# Settings → Secrets and variables → Actions → Variables 에 등록:
+#   VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY (anon 키는 공개 키라 Variable로 충분)
+#   BASE_PATH — https://<계정>.github.io/maru-coffee/ 로 쓰면 /maru-coffee/, 커스텀 도메인이면 비워 둠
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+          BASE_PATH: ${{ vars.BASE_PATH }}
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
