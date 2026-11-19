@@ -13,8 +13,9 @@ import RecipeDetail from './pages/RecipeDetail.jsx';
 import RecipeForm from './pages/RecipeForm.jsx';
 import Brew from './pages/Brew.jsx';
 import Members from './pages/Members.jsx';
+import Privacy from './pages/Privacy.jsx';
 
-// GitHub Pages는 SPA 라우팅을 모르므로 빌드 때 index.html을 404.html로 복사해 둔다(package.json build).
+// GitHub Pages는 SPA 라우팅을 모르므로 빌드 후 tools/postbuild.mjs가 index.html을 404.html 등으로 복사한다.
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
@@ -33,6 +34,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="recipes/:id/edit" element={<RecipeForm />} />
             <Route path="brew" element={<Brew />} />
             <Route path="members" element={<Members />} />
+            <Route path="privacy" element={<Privacy />} />
             <Route path="*" element={<NotFound what="페이지" />} />
           </Route>
         </Routes>

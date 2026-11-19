@@ -136,12 +136,15 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      <footer className="hidden border-t border-line md:block">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8 text-sm text-muted">
+      <footer className="border-t border-line">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-6 text-sm text-muted sm:px-6 sm:py-8">
           <p><span className="font-display font-semibold text-ink">{CLUB.name}</span> · {CLUB.school} {CLUB.tagline}</p>
-          {CLUB.instagram && (
-            <a href={`https://instagram.com/${CLUB.instagram}`} target="_blank" rel="noreferrer" className="hover:text-ink">@{CLUB.instagram}</a>
-          )}
+          <div className="flex items-center gap-4">
+            {CLUB.instagram && (
+              <a href={`https://instagram.com/${CLUB.instagram}`} target="_blank" rel="noreferrer" className="hover:text-ink">@{CLUB.instagram}</a>
+            )}
+            <Link to="/privacy" className="hover:text-ink">개인정보처리방침</Link>
+          </div>
         </div>
       </footer>
 
