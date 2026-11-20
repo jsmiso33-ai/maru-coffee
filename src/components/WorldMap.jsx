@@ -86,7 +86,7 @@ export default function WorldMap({ counts, selectedId, onSelect, className, capt
             {[yN, yS].map((y) => (
               <line key={y} x1={0} x2={W} y1={y} y2={y} stroke="var(--color-crema)" strokeWidth={1} strokeDasharray="4 6" opacity={0.7} />
             ))}
-            <text x={12} y={yN - 7} fontSize={13} fill="var(--color-muted)" fontWeight={600} letterSpacing="0.08em">COFFEE BELT</text>
+            <text x={W - 12} y={yN - 7} textAnchor="end" fontSize={13} fill="var(--color-muted)" fontWeight={600} letterSpacing="0.08em">COFFEE BELT</text>
 
             {shapes.filter((s) => !s.coffee).map((s) => (
               <path key={s.id ?? s.d.slice(0, 20)} d={s.d} fill={fillOf(s)} stroke="var(--color-surface)" strokeWidth={0.6} />
@@ -148,7 +148,7 @@ export default function WorldMap({ counts, selectedId, onSelect, className, capt
         )}
 
         {active && (
-          <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-ink px-3 py-1 text-sm font-semibold text-paper shadow-sm" aria-hidden>
+          <span className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-ink px-3 py-1 text-sm font-semibold text-paper shadow-sm" aria-hidden>
             {active.name}
             {counts && <span className="ml-1.5 font-normal text-paper/70 tnum">노트 {counts.get(active.id) || 0}</span>}
           </span>
