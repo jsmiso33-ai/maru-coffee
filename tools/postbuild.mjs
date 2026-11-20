@@ -26,8 +26,9 @@ for (const f of precache) hash.update(f).update(readFileSync(join('dist', f)));
 const version = hash.digest('hex').slice(0, 12);
 
 const sw = readFileSync('tools/sw-template.js', 'utf8')
-  .replace('__VERSION__', version)
-  .replace('__PRECACHE__', JSON.stringify(precache));
+  .replace("const VERSION = '__VERSION__';", `const VERSION = '${version}';`)
+  .replace('const PRECACHE = __PRECACHE__;', `const PRECACHE = ${JSON.stringify(precache)};`);
+if (sw.includes("'__VERSION__'") || sw.includes('= __PRECACHE__')) throw new Error('sw.js 자리표시자 치환 실패');
 writeFileSync('dist/sw.js', sw);
 
 copyFileSync('dist/index.html', 'dist/404.html');
