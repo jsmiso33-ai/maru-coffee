@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router';
 import { MessageCircle, Send } from 'lucide-react';
 import { addComment, deleteComment, listComments, updateComment, useAsync } from '../lib/db.js';
 import { useAuth } from '../lib/auth.jsx';
@@ -175,7 +176,7 @@ function CommentItem({ comment, canEdit, canDelete, isNoteAuthor, onUpdated, onD
       <Avatar name={comment.author_name} src={comment.author_avatar} size={32} />
       <div className="min-w-0 flex-1">
         <p className="flex flex-wrap items-baseline gap-x-2 text-sm">
-          <span className="font-semibold">{comment.author_name}</span>
+          <Link to={`/people/${comment.user_id}`} className="font-semibold hover:text-accent">{comment.author_name}</Link>
           {isNoteAuthor && <span className="rounded-full bg-accent-soft px-1.5 py-px text-[0.7rem] font-semibold text-accent-strong">작성자</span>}
           <time dateTime={comment.created_at} title={formatDate(comment.created_at)} className="text-xs text-muted">
             {timeAgo(comment.created_at)}{edited && ' · 수정됨'}

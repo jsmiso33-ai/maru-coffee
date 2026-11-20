@@ -38,6 +38,9 @@ const ActivityForm = page(() => import('./pages/ActivityForm.jsx'));
 const Cafes = page(() => import('./pages/Cafes.jsx'));
 const CafeDetail = page(() => import('./pages/CafeDetail.jsx'));
 const CafeForm = page(() => import('./pages/CafeForm.jsx'));
+const CafeReviewForm = page(() => import('./pages/CafeReviewForm.jsx'));
+const Profile = page(() => import('./pages/Profile.jsx'));
+const MyProfile = page(() => import('./pages/Profile.jsx').then((m) => ({ default: m.MyProfile })));
 
 // GitHub Pages는 SPA 라우팅을 모르므로 빌드 후 tools/postbuild.mjs가 index.html을 404.html 등으로 복사한다.
 registerServiceWorker();
@@ -66,6 +69,9 @@ createRoot(document.getElementById('root')).render(
             <Route path="cafes/new" element={<CafeForm />} />
             <Route path="cafes/:id" element={<CafeDetail />} />
             <Route path="cafes/:id/edit" element={<CafeForm />} />
+            <Route path="cafes/:id/review" element={<CafeReviewForm />} />
+            <Route path="people/:id" element={<Profile />} />
+            <Route path="me" element={<MyProfile />} />
             <Route path="recipes" element={<Recipes />} />
             <Route path="recipes/new" element={<RecipeForm />} />
             <Route path="recipes/std/:id" element={<RecipeDetail standard />} />

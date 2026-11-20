@@ -22,8 +22,9 @@ function loadSdk() {
   return sdkPromise;
 }
 
-function pinHtml(active) {
-  return `<span class="cafe-pin${active ? ' is-active' : ''}"></span>`;
+// wish: 후기 없이 '가보고 싶어요'만 있는 곳 — 속이 빈 핀
+function pinHtml(active, wish = false) {
+  return `<span class="cafe-pin${active ? ' is-active' : ''}${wish ? ' is-wish' : ''}"></span>`;
 }
 
 /** LeafletMap과 같은 props: cafes, selectedId, onSelect, pick, onPick, focus, fitToCafes, className */
@@ -89,7 +90,7 @@ export default function NaverMap({ cafes = [], selectedId, onSelect, pick, onPic
         map: m,
         title: c.name,
         zIndex: active ? 1000 : 100,
-        icon: { content: pinHtml(active), anchor: new maps.Point(15, 38) },
+        icon: { content: pinHtml(active, c.reviewCount === 0), anchor: new maps.Point(15, 38) },
       });
       maps.Event.addListener(mk, 'click', () => handlers.current.onSelect?.(c));
       return mk;

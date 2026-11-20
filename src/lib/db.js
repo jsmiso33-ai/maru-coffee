@@ -6,7 +6,7 @@ import { SAMPLE_NOTES } from '../data/sampleNotes.js';
 const NOTE_FIELDS = [
   'bean_name', 'roaster', 'origin', 'process', 'roast_level', 'brew_method', 'tasted_on',
   'flavors', 'acidity', 'sweetness', 'body', 'bitterness', 'aftertaste', 'rating', 'memo',
-  'activity_id', 'activity_bean_id',
+  'activity_id', 'activity_bean_id', 'photos',
 ];
 const RECIPE_FIELDS = [
   'title', 'method', 'dose_g', 'water_g', 'water_temp', 'grind', 'total_time_s', 'steps', 'bean_hint', 'memo',
@@ -132,26 +132,73 @@ export async function deleteComment(id) {
 }
 
 // ───── 카페 지도 ─────
-const CAFE_FIELDS = ['name', 'address', 'region', 'lat', 'lng', 'rating', 'tags', 'signature', 'memo', 'link', 'visited_on'];
+// cafes = 장소, cafe_reviews = 부원별 후기(별점·한 줄 평·사진), cafe_wishes = 가보고 싶어요
+const PLACE_FIELDS = ['name', 'address', 'region', 'lat', 'lng', 'link'];
+const REVIEW_FIELDS = ['rating', 'tags', 'signature', 'memo', 'visited_on', 'photos'];
+const CAFE_SELECT = '*, reviews:cafe_reviews(*), wishes:cafe_wishes(user_id, author_name, created_at)';
+
+// 목록·지도에서 쓰는 요약값을 붙인다
+export function summarizeCafe(c) {
+  const reviews = [...(c.reviews ?? [])].sort((a, b) => b.created_at.localeCompare(a.created_at));
+  const wishes = c.wishes ?? [];
+  const avg = reviews.length ? Math.round((reviews.reduce((s, r) => s + Number(r.rating), 0) / reviews.length) * 10) / 10 : null;
+  const tagCount = new Map();
+  reviews.forEach((r) => r.tags?.forEach((t) => tagCount.set(t, (tagCount.get(t) || 0) + 1)));
+  return {
+    ...c,
+    reviews,
+    wishes,
+    avgRating: avg,
+    reviewCount: reviews.length,
+    wishCount: wishes.length,
+    tagList: [...tagCount.keys()].sort((x, y) => tagCount.get(y) - tagCount.get(x)),
+    latest: reviews[0] ?? null,
+    cover: reviews.find((r) => r.photos?.length)?.photos[0] ?? null,
+  };
+}
 
 export async function listCafes() {
   if (!supabase) return [];
-  return unwrap(await supabase.from('cafes').select('*').order('created_at', { ascending: false }).limit(1000));
+  const rows = unwrap(await supabase.from('cafes').select(CAFE_SELECT).order('created_at', { ascending: false }).limit(1000));
+  return rows.map(summarizeCafe);
 }
 
 export async function getCafe(id) {
   if (!supabase) return null;
-  return unwrap(await supabase.from('cafes').select('*').eq('id', id).maybeSingle());
+  const row = unwrap(await supabase.from('cafes').select(CAFE_SELECT).eq('id', id).maybeSingle());
+  return row ? summarizeCafe(row) : null;
 }
 
-export async function saveCafe(cafe, id) {
-  const row = pick(cafe, CAFE_FIELDS);
+export async function saveCafePlace(place, id) {
+  const row = pick(place, PLACE_FIELDS);
   const q = id ? supabase.from('cafes').update(row).eq('id', id) : supabase.from('cafes').insert(row);
   return unwrap(await q.select().single());
 }
 
 export async function deleteCafe(id) {
   unwrap(await supabase.from('cafes').delete().eq('id', id));
+}
+
+export async function saveReview(cafeId, review, id) {
+  const row = pick(review, REVIEW_FIELDS);
+  const q = id
+    ? supabase.from('cafe_reviews').update(row).eq('id', id)
+    : supabase.from('cafe_reviews').insert({ ...row, cafe_id: cafeId });
+  return unwrap(await q.select().single());
+}
+
+export async function deleteReview(id) {
+  unwrap(await supabase.from('cafe_reviews').delete().eq('id', id));
+}
+
+export async function setWish(cafeId, on) {
+  if (on) {
+    const { error } = await supabase.from('cafe_wishes').insert({ cafe_id: cafeId });
+    if (error && error.code !== '23505') throw new Error(friendlyError(error)); // 이미 찜함
+  } else {
+    const { data: { user } } = await supabase.auth.getUser();
+    unwrap(await supabase.from('cafe_wishes').delete().eq('cafe_id', cafeId).eq('user_id', user.id));
+  }
 }
 
 // ───── 부원 레시피 ─────

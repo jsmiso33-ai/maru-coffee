@@ -10,10 +10,10 @@ const TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
 
 // 이미지 대신 HTML 핀 — 번들러 경로 문제 없고 브랜드 색을 쓸 수 있다
-function pinIcon({ active = false, label } = {}) {
+function pinIcon({ active = false, wish = false, label } = {}) {
   return L.divIcon({
     className: 'cafe-pin-wrap',
-    html: `<span class="cafe-pin${active ? ' is-active' : ''}">${label ? `<b>${label}</b>` : ''}</span>`,
+    html: `<span class="cafe-pin${active ? ' is-active' : ''}${wish ? ' is-wish' : ''}">${label ? `<b>${label}</b>` : ''}</span>`,
     iconSize: [30, 40],
     iconAnchor: [15, 38],
   });
@@ -71,7 +71,7 @@ export default function CafeMap({ cafes = [], selectedId, onSelect, pick, onPick
     for (const c of cafes) {
       const active = c.id === selectedId;
       const marker = L.marker([c.lat, c.lng], {
-        icon: pinIcon({ active }),
+        icon: pinIcon({ active, wish: c.reviewCount === 0 }),
         title: c.name,
         alt: c.name,
         keyboard: true,

@@ -7,6 +7,8 @@ import { ATTRIBUTES } from '../data/options.js';
 import { Avatar, Button, Card, FlavorChip, Notice, Spinner, Stars } from '../components/ui.jsx';
 import { NotFound } from './NotFound.jsx';
 import Comments from '../components/Comments.jsx';
+import { PhotoStrip } from '../components/Photos.jsx';
+import { removePhotos } from '../lib/photos.js';
 import WorldMap from '../components/WorldMap.jsx';
 import { matchOrigin } from '../data/origins.js';
 import RadarChart from '../components/RadarChart.jsx';
@@ -37,6 +39,7 @@ export default function NoteDetail() {
     setActionError('');
     try {
       await deleteNote(note.id);
+      removePhotos(note.photos);
       navigate('/notes', { replace: true });
     } catch (e) {
       setActionError(e.message);
@@ -67,10 +70,10 @@ export default function NoteDetail() {
             <Stars value={Number(note.rating)} size={20} />
             <span className="font-display text-2xl tnum">{Number(note.rating).toFixed(1)}</span>
           </span>
-          <span className="flex items-center gap-2 text-sm text-ink-soft">
+          <Link to={note.user_id ? `/people/${note.user_id}` : '#'} className="flex items-center gap-2 text-sm text-ink-soft hover:text-accent">
             <Avatar name={note.author_name} src={note.author_avatar} size={26} />
             <span className="font-semibold">{note.author_name}</span>
-          </span>
+          </Link>
         </div>
       </header>
 
@@ -88,6 +91,8 @@ export default function NoteDetail() {
           <ChevronRight size={16} className="shrink-0 text-muted" />
         </Link>
       )}
+
+      {note.photos?.length > 0 && <PhotoStrip paths={note.photos} className="mt-6" />}
 
       <div className="mt-8 grid gap-5 md:grid-cols-[1fr_1.15fr]">
         <Card className="flex flex-col items-center p-5">

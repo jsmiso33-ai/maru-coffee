@@ -9,6 +9,7 @@ import { ATTRIBUTES, BREW_METHODS, ORIGINS, PROCESSES, ROAST_LEVELS, processOpti
 import { FLAVOR_GROUPS } from '../data/flavors.js';
 import { Button, Card, FlavorChip, Label, Notice, ScaleInput, Spinner, StarInput, cx } from '../components/ui.jsx';
 import MemberGate from '../components/MemberGate.jsx';
+import { PhotoPicker } from '../components/Photos.jsx';
 import RadarChart from '../components/RadarChart.jsx';
 import WorldMap from '../components/WorldMap.jsx';
 import { matchOrigin } from '../data/origins.js';
@@ -25,6 +26,7 @@ const EMPTY = {
   bean_name: '', roaster: '', origin: '', process: '', customProcess: '', roast_level: '', brew_method: '',
   tasted_on: today(), flavors: [], acidity: 3, sweetness: 3, body: 3, bitterness: 3, aftertaste: 3,
   rating: 3.5, memo: '', activity_id: '', activity_bean_id: '',
+  photos: [],
 };
 
 export default function NoteForm() {
@@ -293,6 +295,7 @@ function NoteFormInner({ preview = false }) {
 
         <Card className="space-y-5 p-5 sm:p-6">
           <SectionTitle n="4">한 줄 정리</SectionTitle>
+          <PhotoPicker label="사진 (원두 봉투·잔·카페)" value={Array.isArray(form.photos) ? form.photos : []} onChange={set('photos')} />
           <div>
             <p className="mb-2 text-sm font-semibold">별점</p>
             <StarInput value={form.rating} onChange={set('rating')} />

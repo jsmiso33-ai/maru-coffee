@@ -4,6 +4,7 @@ import { Avatar, FlavorChip } from './ui.jsx';
 import RadarChart from './RadarChart.jsx';
 import { formatDate } from '../lib/format.js';
 import { commentCount } from '../lib/db.js';
+import { photoUrl } from '../lib/photos.js';
 
 export default function NoteCard({ note }) {
   const meta = [note.origin, note.process, note.roast_level].filter(Boolean).join(' · ');
@@ -24,7 +25,11 @@ export default function NoteCard({ note }) {
           {meta && <p className="mt-1.5 text-sm text-muted">{meta}</p>}
         </div>
         <div className="shrink-0" aria-hidden>
-          <RadarChart note={note} size={54} compact />
+          {note.photos?.length ? (
+            <img src={photoUrl(note.photos[0])} alt="" loading="lazy" className="size-14 rounded-lg object-cover" />
+          ) : (
+            <RadarChart note={note} size={54} compact />
+          )}
         </div>
       </div>
 

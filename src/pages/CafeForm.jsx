@@ -1,21 +1,29 @@
 import { Suspense, lazy, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { ArrowLeft, LoaderCircle, MapPin, Search } from 'lucide-react';
-import { getCafe, saveCafe } from '../lib/db.js';
+import { ArrowLeft, Heart, LoaderCircle, MapPin, Search, Star } from 'lucide-react';
+import { getCafe, listCafes, saveCafePlace, saveReview, setWish } from '../lib/db.js';
 import { useAuth } from '../lib/auth.jsx';
 import { reverseGeocode, searchPlaces } from '../lib/geocode.js';
-import { CAFE_REGIONS, CAFE_TAGS, guessRegion } from '../data/cafes.js';
-import { Button, Card, Label, Notice, Spinner, StarInput, cx } from '../components/ui.jsx';
+import { CAFE_REGIONS, guessRegion } from '../data/cafes.js';
+import { Button, Card, Label, Notice, Segmented, Spinner, cx } from '../components/ui.jsx';
+import CafeReviewFields, { EMPTY_REVIEW, cleanReview } from '../components/CafeReviewFields.jsx';
 import MemberGate from '../components/MemberGate.jsx';
 import { NotFound } from './NotFound.jsx';
-import { todayKey } from '../lib/format.js';
 
 const CafeMap = lazy(() => import('../components/CafeMap.jsx'));
 
-const EMPTY = {
-  name: '', address: '', region: '', lat: null, lng: null, rating: 4, tags: [],
-  signature: '', memo: '', link: '', visited_on: '',
-};
+// 장소 정보(cafes). 별점·한 줄 평은 후기(cafe_reviews)로 따로 저장한다
+const EMPTY = { name: '', address: '', region: '', lat: null, lng: null, link: '' };
+
+// 두 지점 사이 거리(m)
+function meters(a, b) {
+  const R = 6371000;
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+const norm = (s) => String(s ?? '').replace(/\s+/g, '').toLowerCase();
 
 export default function CafeForm() {
   return (
@@ -35,6 +43,9 @@ function CafeFormInner() {
   const [touched, setTouched] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [mode, setMode] = useState('visited'); // 새 카페: 다녀왔어요(후기) | 가보고 싶어요(찜)
+  const [review, setReview] = useState(EMPTY_REVIEW);
+  const [existing, setExisting] = useState([]);
 
   // 장소 검색
   const [query, setQuery] = useState('');
@@ -45,11 +56,14 @@ function CafeFormInner() {
   const [resolving, setResolving] = useState(false);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      listCafes().then(setExisting).catch(() => {}); // 이미 등록된 카페인지 확인용
+      return;
+    }
     getCafe(id)
       .then((c) => {
         if (!c || c.user_id !== user?.id) return setNotFound(true);
-        setForm({ ...EMPTY, ...Object.fromEntries(Object.entries(c).map(([k, v]) => [k, v ?? ''])), rating: Number(c.rating), tags: c.tags ?? [] });
+        setForm(Object.fromEntries(Object.keys(EMPTY).map((k) => [k, c[k] ?? EMPTY[k]])));
         setFocus({ lat: c.lat, lng: c.lng, zoom: 16 });
       })
       .catch((e) => setLoadError(e.message));
@@ -104,10 +118,14 @@ function CafeFormInner() {
     }
   };
 
-  const toggleTag = (t) => setForm((f) => ({
-    ...f,
-    tags: f.tags.includes(t) ? f.tags.filter((x) => x !== t) : f.tags.length >= 10 ? f.tags : [...f.tags, t],
-  }));
+  // 핀 근처(120m)에 이름이 비슷하거나 아주 가까운(40m) 카페가 이미 있으면 알려 준다
+  const duplicate = !id && hasPin
+    ? existing.find((c) => {
+        const d = meters(c, form);
+        const sameName = form.name.trim() && (norm(c.name).includes(norm(form.name)) || norm(form.name).includes(norm(c.name)));
+        return d < 40 || (d < 120 && sameName);
+      })
+    : null;
 
   const errors = touched ? {
     name: !form.name.trim() && '카페 이름을 적어 주세요.',
@@ -124,8 +142,12 @@ function CafeFormInner() {
     setSaving(true);
     setError('');
     try {
-      const saved = await saveCafe({ ...form, name: form.name.trim(), address: form.address.trim(), signature: form.signature.trim(), memo: form.memo.trim(), link }, id);
-      navigate(`/cafes/${saved.id}`, { replace: true });
+      const place = await saveCafePlace({ ...form, name: form.name.trim(), address: form.address.trim(), link }, id);
+      if (!id) {
+        if (mode === 'visited') await saveReview(place.id, cleanReview(review));
+        else await setWish(place.id, true);
+      }
+      navigate(`/cafes/${place.id}`, { replace: true });
     } catch (err) {
       setError(err.message);
       setSaving(false);
@@ -137,7 +159,20 @@ function CafeFormInner() {
       <Link to={id ? `/cafes/${id}` : '/cafes'} className="mb-6 inline-flex items-center gap-1 text-sm font-semibold text-muted hover:text-ink">
         <ArrowLeft size={16} /> 카페 지도
       </Link>
-      <h1 className="mb-8 text-3xl font-bold tracking-tight">{id ? '카페 기록 수정' : '카페 기록하기'}</h1>
+      <h1 className="mb-6 text-3xl font-bold tracking-tight">{id ? '카페 정보 수정' : '카페 추가'}</h1>
+      {!id && (
+        <div className="mb-6">
+          <Segmented
+            label="어떤 카페인가요"
+            value={mode}
+            onChange={setMode}
+            options={[{ value: 'visited', label: '다녀왔어요' }, { value: 'wish', label: '가보고 싶어요' }]}
+          />
+          <p className="mt-2 text-sm text-muted">
+            {mode === 'visited' ? '별점과 한 줄 평을 남겨요. 다른 부원도 같은 카페에 후기를 더할 수 있어요.' : '후기 없이 찜만 해 둬요. 카페 투어 장소를 정할 때 모아 볼 수 있어요.'}
+          </p>
+        </div>
+      )}
 
       <div className="space-y-5">
         <Card className="space-y-5 p-5 sm:p-6">
@@ -202,6 +237,16 @@ function CafeFormInner() {
             {errors.pin && <p className="mt-1 text-sm text-accent">{errors.pin}</p>}
           </div>
 
+          {duplicate && (
+            <Notice tone="accent" icon={MapPin}>
+              <strong className="font-semibold">‘{duplicate.name}’</strong>이(가) 이미 지도에 있어요. 같은 곳이면 거기에 더해 주세요.
+              <span className="mt-2 flex flex-wrap gap-2">
+                <Button size="sm" variant="accent" to={`/cafes/${duplicate.id}/review`}><Star size={14} /> 후기 남기기</Button>
+                <Button size="sm" variant="outline" to={`/cafes/${duplicate.id}`}><Heart size={14} /> 카페 보러 가기</Button>
+              </span>
+            </Notice>
+          )}
+
           <div>
             <Label htmlFor="address" hint={resolving ? '주소 찾는 중…' : undefined}>주소</Label>
             <input {...bind('address')} maxLength={160} className="field" placeholder="핀을 찍으면 자동으로 채워져요" />
@@ -224,49 +269,19 @@ function CafeFormInner() {
             </div>
             {errors.region && <p className="mt-1.5 text-sm text-accent">{errors.region}</p>}
           </fieldset>
-        </Card>
-
-        <Card className="space-y-5 p-5 sm:p-6">
-          <div>
-            <p className="mb-2 text-sm font-semibold">별점</p>
-            <StarInput value={form.rating} onChange={set('rating')} />
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <Label htmlFor="signature">추천 메뉴</Label>
-              <input {...bind('signature')} maxLength={80} className="field" placeholder="예: 게이샤 핸드드립, 플랫화이트" />
-            </div>
-            <div>
-              <Label htmlFor="visited_on">다녀온 날</Label>
-              <input {...bind('visited_on')} type="date" max={todayKey()} className="field" />
-            </div>
-          </div>
-          <fieldset>
-            <legend className="mb-2 text-sm font-semibold">특징 <span className="text-xs font-normal text-muted">여러 개 선택</span></legend>
-            <div className="flex flex-wrap gap-1.5">
-              {CAFE_TAGS.map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  aria-pressed={form.tags.includes(t)}
-                  onClick={() => toggleTag(t)}
-                  className={cx('h-11 rounded-full border px-3.5 text-sm sm:h-9', form.tags.includes(t) ? 'border-ink bg-ink font-semibold text-paper' : 'border-line bg-surface text-ink-soft hover:border-line-strong')}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          </fieldset>
-          <div>
-            <Label htmlFor="memo" hint={`${form.memo.length}/2000`}>한 줄 평</Label>
-            <textarea {...bind('memo')} rows={4} maxLength={2000} className="field resize-y leading-relaxed" placeholder="어떤 원두를 쓰는지, 분위기, 다시 갈 이유…" />
-          </div>
           <div>
             <Label htmlFor="link">링크</Label>
-            <input {...bind('link')} type="url" inputMode="url" maxLength={300} className="field" placeholder="인스타그램·네이버 플레이스 주소 (선택)" aria-invalid={Boolean(errors.link)} />
+            <input {...bind('link')} type="url" inputMode="url" maxLength={300} className="field" placeholder="인스타그램·홈페이지 주소 (선택)" aria-invalid={Boolean(errors.link)} />
             {errors.link && <p className="mt-1.5 text-sm text-accent">{errors.link}</p>}
           </div>
         </Card>
+
+        {!id && mode === 'visited' && (
+          <Card className="p-5 sm:p-6">
+            <h2 className="mb-5 text-lg font-bold">내 후기</h2>
+            <CafeReviewFields review={review} onChange={setReview} />
+          </Card>
+        )}
       </div>
 
       {error && <div className="mt-5"><Notice tone="accent">{error}</Notice></div>}
@@ -275,7 +290,7 @@ function CafeFormInner() {
         <div className="flex gap-2 rounded-full border border-line bg-surface/95 p-1.5 shadow-[var(--shadow-card)] backdrop-blur">
           <Button variant="ghost" onClick={() => navigate(-1)} disabled={saving}>취소</Button>
           <button type="submit" disabled={saving} className="inline-flex h-11 items-center rounded-full bg-accent px-6 font-semibold text-white hover:bg-accent-strong disabled:opacity-50">
-            {saving ? '저장 중…' : id ? '수정 완료' : '카페 올리기'}
+            {saving ? '저장 중…' : id ? '수정 완료' : mode === 'visited' ? '후기 올리기' : '찜해 두기'}
           </button>
         </div>
       </div>

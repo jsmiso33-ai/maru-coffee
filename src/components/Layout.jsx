@@ -95,6 +95,9 @@ function AccountMenu() {
       {open && (
         <div role="menu" className="absolute right-0 z-30 mt-2 w-60 rounded-2xl border border-line bg-surface p-1.5 shadow-[var(--shadow-card)]">
           <p className="truncate px-3 pb-2 pt-1.5 text-xs text-muted">{user.email}</p>
+          <Link role="menuitem" to="/me" className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm hover:bg-sunken">
+            <Coffee size={16} /> 내 커피 취향
+          </Link>
           {isAdmin && (
             <Link role="menuitem" to="/members" className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm hover:bg-sunken">
               <Users size={16} /> 운영진 관리

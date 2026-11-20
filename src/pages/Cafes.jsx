@@ -1,6 +1,7 @@
 import { Suspense, lazy, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
-import { LocateFixed, MapPin, Plus, Star, X } from 'lucide-react';
+import { Heart, LocateFixed, MapPin, Plus, Star, X } from 'lucide-react';
+import { photoUrl } from '../lib/photos.js';
 import { listCafes, useAsync } from '../lib/db.js';
 import { isConfigured } from '../lib/supabase.js';
 import { CAFE_REGIONS, CAFE_TAGS } from '../data/cafes.js';
@@ -16,6 +17,7 @@ export default function Cafes() {
   const region = params.get('region') ?? '';
   const tag = params.get('tag') ?? '';
   const sort = params.get('sort') ?? 'new';
+  const kind = params.get('kind') ?? ''; // '' | visited | wish
   const [selected, setSelected] = useState(null);
   const [focus, setFocus] = useState(null);
   const [locating, setLocating] = useState(false);
@@ -37,10 +39,13 @@ export default function Cafes() {
   }, [all]);
 
   const cafes = useMemo(() => {
-    const list = all.filter((c) => (!region || c.region === region) && (!tag || c.tags?.includes(tag)));
-    if (sort === 'rating') list.sort((a, b) => b.rating - a.rating || b.created_at.localeCompare(a.created_at));
+    const list = all.filter((c) => (!region || c.region === region)
+      && (!tag || c.tagList.includes(tag))
+      && (kind !== 'visited' || c.reviewCount > 0)
+      && (kind !== 'wish' || c.wishCount > 0));
+    if (sort === 'rating') list.sort((a, b) => (b.avgRating ?? -1) - (a.avgRating ?? -1) || b.created_at.localeCompare(a.created_at));
     return list;
-  }, [all, region, tag, sort]);
+  }, [all, region, tag, sort, kind]);
 
   const locate = () => {
     if (!('geolocation' in navigator)) return setLocError('이 브라우저는 위치 찾기를 지원하지 않아요.');
@@ -104,6 +109,12 @@ export default function Cafes() {
         <section aria-label="카페 목록">
           {/* 특징·정렬은 목록 바로 위에 — 지역 칩과 겹쳐 두 줄로 쌓이지 않게 */}
           <div className="mb-3 flex flex-wrap items-center gap-2">
+            <Segmented
+              label="분류"
+              value={kind}
+              onChange={(v) => update('kind', v)}
+              options={[{ value: '', label: '전체' }, { value: 'visited', label: '다녀온 곳' }, { value: 'wish', label: '가보고 싶은 곳' }]}
+            />
             {!loading && <span className="mr-auto text-sm text-muted tnum">{cafes.length}곳</span>}
             <select
               aria-label="분위기·특징"
@@ -120,7 +131,7 @@ export default function Cafes() {
               onChange={(v) => update('sort', v === 'new' ? '' : v)}
               options={[{ value: 'new', label: '최신순' }, { value: 'rating', label: '별점순' }]}
             />
-            {(region || tag) && (
+            {(region || tag || kind) && (
               <button type="button" onClick={() => { setParams({}, { replace: true }); setSelected(null); }} className="inline-flex h-11 items-center gap-1 px-1 text-sm text-muted hover:text-ink sm:h-10">
                 <X size={15} /> 초기화
               </button>
@@ -176,19 +187,24 @@ function CafeRow({ cafe, active, onFocusMap }) {
       <Link to={`/cafes/${cafe.id}`} className="group min-w-0 flex-1 p-4">
         <div className="flex items-baseline justify-between gap-3">
           <h3 className="truncate font-bold group-hover:text-accent">{cafe.name}</h3>
-          <span className="inline-flex shrink-0 items-center gap-1 text-sm font-bold text-accent tnum">
-            <Star size={13} fill="currentColor" /> {Number(cafe.rating).toFixed(1)}
-          </span>
+          <CafeScore cafe={cafe} />
         </div>
         <p className="mt-0.5 truncate text-sm text-muted">{cafe.region}{cafe.address ? ` · ${cafe.address}` : ''}</p>
-        {cafe.signature && <p className="mt-1.5 truncate text-sm text-ink-soft">추천 · {cafe.signature}</p>}
-        {cafe.tags?.length > 0 && (
-          <p className="mt-2 flex flex-wrap gap-1">
-            {cafe.tags.slice(0, 4).map((t) => <span key={t} className="rounded-md bg-sunken px-1.5 py-0.5 text-xs text-ink-soft">{t}</span>)}
-          </p>
-        )}
-        <p className="mt-2.5 flex items-center gap-1.5 text-xs text-muted">
-          <Avatar name={cafe.author_name} src={cafe.author_avatar} size={18} /> {cafe.author_name}
+        <div className="mt-2 flex gap-3">
+          <div className="min-w-0 flex-1">
+            {cafe.latest?.signature && <p className="truncate text-sm text-ink-soft">추천 · {cafe.latest.signature}</p>}
+            {cafe.latest?.memo && <p className="mt-0.5 line-clamp-1 text-sm text-muted">“{cafe.latest.memo}”</p>}
+            {cafe.tagList.length > 0 && (
+              <p className="mt-2 flex flex-wrap gap-1">
+                {cafe.tagList.slice(0, 3).map((t) => <span key={t} className="rounded-md bg-sunken px-1.5 py-0.5 text-xs text-ink-soft">{t}</span>)}
+              </p>
+            )}
+          </div>
+          {cafe.cover && <img src={photoUrl(cafe.cover)} alt="" loading="lazy" className="size-16 shrink-0 rounded-lg object-cover" />}
+        </div>
+        <p className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
+          {cafe.reviewCount > 0 && <span className="inline-flex items-center gap-1.5"><Avatar name={cafe.latest.author_name} src={cafe.latest.author_avatar} size={18} /> {cafe.reviewCount > 1 ? `${cafe.latest.author_name} 외 ${cafe.reviewCount - 1}명` : cafe.latest.author_name}</span>}
+          {cafe.wishCount > 0 && <span className="inline-flex items-center gap-1 text-accent"><Heart size={12} fill="currentColor" /> {cafe.wishCount}</span>}
         </p>
       </Link>
       <button
@@ -210,10 +226,10 @@ function SelectedCafe({ cafe, onClose }) {
         <div className="min-w-0 flex-1">
           <p className="flex items-center gap-2">
             <strong className="truncate text-base">{cafe.name}</strong>
-            <span className="inline-flex shrink-0 items-center gap-1 text-sm font-bold text-accent tnum"><Star size={13} fill="currentColor" /> {Number(cafe.rating).toFixed(1)}</span>
+            <CafeScore cafe={cafe} />
           </p>
           <p className="mt-0.5 truncate text-sm text-muted">{cafe.address || cafe.region}</p>
-          {cafe.memo && <p className="mt-1.5 line-clamp-2 text-sm text-ink-soft">{cafe.memo}</p>}
+          {cafe.latest?.memo && <p className="mt-1.5 line-clamp-2 text-sm text-ink-soft">“{cafe.latest.memo}”</p>}
         </div>
         <button type="button" onClick={onClose} aria-label="닫기" className="-mr-1.5 -mt-1.5 grid size-11 shrink-0 place-items-center rounded-full text-muted hover:bg-sunken"><X size={17} /></button>
       </div>
@@ -222,5 +238,18 @@ function SelectedCafe({ cafe, onClose }) {
         <Button to={`/cafes/${cafe.id}`} size="sm" variant="outline">마루 후기 보기</Button>
       </div>
     </div>
+  );
+}
+
+// 별점 평균(후기 수) — 후기 없이 찜만 된 곳은 '가보고 싶어요'
+function CafeScore({ cafe }) {
+  if (cafe.avgRating == null) {
+    return <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-accent"><Heart size={12} /> 가보고 싶어요</span>;
+  }
+  return (
+    <span className="inline-flex shrink-0 items-center gap-1 text-sm font-bold text-accent tnum">
+      <Star size={13} fill="currentColor" /> {cafe.avgRating.toFixed(1)}
+      {cafe.reviewCount > 1 && <span className="text-xs font-normal text-muted">({cafe.reviewCount})</span>}
+    </span>
   );
 }
