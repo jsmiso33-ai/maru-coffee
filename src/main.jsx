@@ -42,6 +42,10 @@ const CafeForm = page(() => import('./pages/CafeForm.jsx'));
 // GitHub Pages는 SPA 라우팅을 모르므로 빌드 후 tools/postbuild.mjs가 index.html을 404.html 등으로 복사한다.
 registerServiceWorker();
 
+// 개발 서버 전용: /fonts 폰트 비교 화면과, 거기서 고른 폰트를 사이트 전체에 미리 적용 (배포 빌드에선 빠진다)
+const FontLab = import.meta.env.DEV ? page(() => import('./pages/FontLab.jsx')) : null;
+if (import.meta.env.DEV) import('./pages/FontLab.jsx').then((m) => m.applyFontPreview());
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
@@ -71,6 +75,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="brew" element={<Navigate to="/recipes" replace />} />
             <Route path="members" element={<Members />} />
             <Route path="privacy" element={<Privacy />} />
+            {FontLab && <Route path="fonts" element={<FontLab />} />}
             <Route path="*" element={<NotFound what="페이지" />} />
           </Route>
         </Routes>
