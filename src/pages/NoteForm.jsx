@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import { ArrowLeft, CalendarDays, MapPin, Plus } from 'lucide-react';
-import { getNote, listActivities, saveNote } from '../lib/db.js';
+import { getActivity, getNote, listActivities, saveNote } from '../lib/db.js';
 import { daysUntil, formatDay } from '../lib/format.js';
 import { useAuth } from '../lib/auth.jsx';
 import { isConfigured } from '../lib/supabase.js';
@@ -51,15 +51,25 @@ function NoteFormInner({ preview = false }) {
   const [touched, setTouched] = useState(false);
   const [customFlavor, setCustomFlavor] = useState('');
   const [params] = useSearchParams();
+  const requestedActivityId = id ? null : params.get('activity');
   const [activities, setActivities] = useState([]);
   const prefilled = useRef(false);
 
-  // 노트를 연결할 수 있는 활동: 최근 120일 ~ 일주일 뒤
+  // 활동에서 바로 들어오면 날짜와 관계없이 해당 모임과 원두를 선택할 수 있다.
   useEffect(() => {
-    listActivities()
-      .then((all) => setActivities(all.filter((a) => daysUntil(a.held_on) >= -120 && daysUntil(a.held_on) <= 7)))
-      .catch(() => setActivities([]));
-  }, []);
+    let active = true;
+    async function loadActivities() {
+      const all = await listActivities();
+      const options = all.filter((a) => a.id === requestedActivityId || (daysUntil(a.held_on) >= -120 && daysUntil(a.held_on) <= 7));
+      if (requestedActivityId && !options.some((a) => a.id === requestedActivityId)) {
+        const requested = await getActivity(requestedActivityId).catch(() => null);
+        if (requested) options.push(requested);
+      }
+      if (active) setActivities(options);
+    }
+    loadActivities().catch(() => { if (active) setActivities([]); });
+    return () => { active = false; };
+  }, [requestedActivityId]);
 
   // 활동 페이지의 "이 원두 노트 쓰기"로 들어오면(?activity=&bean=) 원두 정보를 미리 채운다
   useEffect(() => {

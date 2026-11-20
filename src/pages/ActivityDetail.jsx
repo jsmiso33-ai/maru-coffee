@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { ArrowLeft, Clock, MapPin, NotebookPen, Package, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, Clock, MapPin, NotebookPen, Package, Pencil, QrCode, Trash2 } from 'lucide-react';
 import { deleteActivity, getActivity, listNotesForActivity, useAsync } from '../lib/db.js';
 import { useAuth } from '../lib/auth.jsx';
 import { ATTRIBUTES } from '../data/options.js';
 import { Button, Card, FlavorChip, Notice, Spinner, Stars } from '../components/ui.jsx';
 import { DDay, KindBadge } from '../components/ActivityBits.jsx';
+import ActivityQrDialog from '../components/ActivityQrDialog.jsx';
 import NoteCard from '../components/NoteCard.jsx';
 import RadarChart from '../components/RadarChart.jsx';
 import { NotFound } from './NotFound.jsx';
@@ -41,6 +42,7 @@ function summarize(notes) {
 function ActivityView({ activity, notes }) {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
+  const [showQr, setShowQr] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [actionError, setActionError] = useState('');
 
@@ -87,8 +89,16 @@ function ActivityView({ activity, notes }) {
             </p>
           )}
         </div>
-        <Button to={`/notes/new?activity=${activity.id}`} size="lg"><NotebookPen size={18} /> 이 활동 노트 쓰기</Button>
+        <div className="grid gap-2 sm:flex sm:flex-wrap">
+          <Button to={`/notes/new?activity=${activity.id}`} size="lg"><NotebookPen size={18} /> 이 활동 노트 쓰기</Button>
+          {isAdmin && (
+            <Button variant="outline" size="lg" aria-haspopup="dialog" onClick={() => setShowQr(true)}>
+              <QrCode size={18} /> QR 보여주기
+            </Button>
+          )}
+        </div>
       </header>
+      {isAdmin && showQr && <ActivityQrDialog activity={activity} onClose={() => setShowQr(false)} />}
 
       {(activity.description || activity.prep) && (
         <div className="mt-6 grid gap-4 md:grid-cols-[1.4fr_1fr]">
