@@ -31,6 +31,8 @@ export const KOREA_BOUNDS = [[33.0, 124.6], [38.65, 130.95]];
 export function kakaoMapUrl(cafe) {
   return `https://map.kakao.com/link/map/${encodeURIComponent(cafe.name)},${cafe.lat},${cafe.lng}`;
 }
+// 네이버 지도는 "이름 + 전체 주소"로 찾으면 결과가 없고, "시·도 + 구 + 이름"이면 그 가게가 바로 열린다
 export function naverMapUrl(cafe) {
-  return `https://map.naver.com/p/search/${encodeURIComponent(`${cafe.name} ${cafe.address ?? ''}`.trim())}`;
+  const area = String(cafe.address ?? '').trim().split(/\s+/).slice(0, 2).join(' ');
+  return `https://map.naver.com/p/search/${encodeURIComponent(`${area} ${cafe.name}`.trim())}`;
 }
