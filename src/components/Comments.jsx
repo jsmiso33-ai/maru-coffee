@@ -8,7 +8,7 @@ import { formatDate, timeAgo } from '../lib/format.js';
 
 const MAX = 500;
 
-// 노트 아래 댓글. 읽기는 누구나, 쓰기는 부원만.
+// 노트 아래 댓글. 읽기는 누구나, 쓰기는 로그인한 사람.
 // 삭제: 본인 · 노트 작성자 · 운영진 (DB 정책과 같은 규칙으로 버튼을 보여 준다)
 export default function Comments({ note }) {
   const { user, isMember, isAdmin, signIn, loading: authLoading } = useAuth();
@@ -56,11 +56,11 @@ export default function Comments({ note }) {
       <div className="mt-4">
         {authLoading ? null : !user ? (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-card)] border border-dashed border-line-strong px-4 py-3.5 text-sm text-muted">
-            댓글은 부원만 쓸 수 있어요.
+            로그인하면 댓글을 쓸 수 있어요.
             <Button size="sm" variant="outline" onClick={signIn}>로그인</Button>
           </div>
         ) : !isMember ? (
-          <p className="text-sm text-muted">부원 명단에 등록된 계정만 댓글을 쓸 수 있어요.</p>
+          <p className="text-sm text-muted">로그인 정보를 확인하고 있어요. 잠시 뒤 새로고침해 주세요.</p>
         ) : (
           <CommentForm noteId={note.id} onAdded={onAdded} />
         )}

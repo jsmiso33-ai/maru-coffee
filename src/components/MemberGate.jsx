@@ -4,7 +4,7 @@ import { isConfigured } from '../lib/supabase.js';
 import { Button, Card, Spinner } from './ui.jsx';
 import { GoogleMark } from './Layout.jsx';
 
-// 부원만 볼 수 있는 화면(작성·수정·관리)을 감싼다.
+// 로그인이 필요한 화면(작성·수정)과 운영진 전용 화면(admin)을 감싼다.
 export default function MemberGate({ children, admin = false, what = '글을 쓰려면' }) {
   const { user, loading, isMember, isAdmin, signIn, signOut } = useAuth();
 
@@ -22,7 +22,7 @@ export default function MemberGate({ children, admin = false, what = '글을 쓰
   if (!user) {
     return (
       <GateCard icon={Lock} title={`${what} 로그인이 필요해요`}>
-        부원 명단에 등록된 구글 계정으로 로그인해 주세요.
+        구글 계정으로 로그인하면 바로 쓸 수 있어요.
         <div className="mt-5">
           <Button variant="outline" onClick={signIn}><GoogleMark /> 구글로 로그인</Button>
         </div>
@@ -31,11 +31,10 @@ export default function MemberGate({ children, admin = false, what = '글을 쓰
   }
   if (admin ? !isAdmin : !isMember) {
     return (
-      <GateCard icon={UserRoundX} title={admin ? '관리자만 볼 수 있어요' : '부원 명단에 없는 계정이에요'}>
-        {admin ? '부원 관리는 회장·운영진 계정에서만 열려요.' : (
+      <GateCard icon={UserRoundX} title={admin ? '운영진만 볼 수 있어요' : '로그인 정보를 확인하지 못했어요'}>
+        {admin ? '회장·운영진 계정에서만 열리는 화면이에요.' : (
           <>
-            <strong className="font-semibold text-ink">{user.email}</strong> 을(를) 회장에게 알려 주면 명단에 추가해 줄 거예요.
-            다른 계정으로 로그인했다면 로그아웃 후 다시 시도해 주세요.
+            새로고침해도 계속 이 화면이 보이면 로그아웃 후 다시 로그인해 주세요.
           </>
         )}
         <div className="mt-5 flex flex-wrap justify-center gap-2">

@@ -8,7 +8,7 @@ import { formatDate } from '../lib/format.js';
 
 export default function Members() {
   return (
-    <MemberGate admin what="부원 관리는">
+    <MemberGate admin what="운영진 관리는">
       <MembersInner />
     </MemberGate>
   );
@@ -20,7 +20,7 @@ function MembersInner() {
   const { user } = useAuth();
   const { data, loading, error, reload } = useAsync(listMembers, []);
   const [bulk, setBulk] = useState('');
-  const [role, setRole] = useState('member');
+  const role = 'admin';
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState(null);
   const [pendingDelete, setPendingDelete] = useState(null);
@@ -52,7 +52,7 @@ function MembersInner() {
     }
     setBusy(false);
     setBulk('');
-    setMessage(failed.length ? { tone: 'accent', text: `${ok}명 추가, 실패: ${failed.join(', ')}` } : { tone: 'neutral', text: `${ok}명을 명단에 추가했어요.` });
+    setMessage(failed.length ? { tone: 'accent', text: `${ok}명 추가, 실패: ${failed.join(', ')}` } : { tone: 'neutral', text: `${ok}명을 운영진으로 추가했어요.` });
     reload();
   };
 
@@ -77,13 +77,13 @@ function MembersInner() {
 
   return (
     <>
-      <PageHeader eyebrow="Admin" title="부원 관리">
-        명단에 있는 구글 계정만 노트·레시피를 쓸 수 있어요. 명단에서 빼도 이미 쓴 글은 남아요.
+      <PageHeader eyebrow="Admin" title="운영진 관리">
+        노트·레시피·댓글은 로그인한 누구나 쓸 수 있어요. 여기 있는 운영진은 활동을 만들고, 모든 글과 댓글을 지우고, 운영진을 관리할 수 있어요.
       </PageHeader>
 
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_1.4fr]">
         <Card className="p-5 sm:p-6">
-          <h2 className="flex items-center gap-2 font-bold"><UserPlus size={18} /> 부원 추가</h2>
+          <h2 className="flex items-center gap-2 font-bold"><UserPlus size={18} /> 운영진 추가</h2>
           <label htmlFor="bulk" className="mt-4 block text-sm text-muted">한 줄에 한 명씩 — <span className="font-mono text-xs">이름, 이메일</span> 또는 이메일만</label>
           <textarea
             id="bulk"
@@ -98,11 +98,7 @@ function MembersInner() {
               {valid.length}명 인식{parsed.length > valid.length && <span className="text-accent"> · 이메일을 못 찾은 줄 {parsed.length - valid.length}개</span>}
             </p>
           )}
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={role === 'admin'} onChange={(e) => setRole(e.target.checked ? 'admin' : 'member')} className="size-4 accent-[var(--color-accent)]" />
-              운영진(관리자)으로 추가
-            </label>
+          <div className="mt-4 flex flex-wrap items-center justify-end gap-3">
             <Button onClick={add} disabled={!valid.length || busy}>{busy ? '추가 중…' : `${valid.length || ''}명 추가`}</Button>
           </div>
           {message && <div className="mt-4"><Notice tone={message.tone}>{message.text}</Notice></div>}
@@ -110,7 +106,7 @@ function MembersInner() {
 
         <Card className="overflow-hidden">
           <div className="flex items-center justify-between border-b border-line px-5 py-4">
-            <h2 className="font-bold">명단</h2>
+            <h2 className="font-bold">운영진</h2>
             {data && <span className="text-sm text-muted tnum">{data.length}명</span>}
           </div>
           {loading ? <Spinner /> : error ? <div className="p-5"><Notice tone="accent">{error}</Notice></div> : (
@@ -130,7 +126,7 @@ function MembersInner() {
                       title={me ? '자기 권한은 바꿀 수 없어요' : '눌러서 권한 전환'}
                       className={cx('h-10 rounded-full px-3.5 text-xs font-semibold disabled:cursor-not-allowed', m.role === 'admin' ? 'bg-accent-soft text-accent-strong' : 'bg-sunken text-ink-soft hover:bg-line')}
                     >
-                      {m.role === 'admin' ? '운영진' : '부원'}
+                      {m.role === 'admin' ? '운영진' : '권한 없음'}
                     </button>
                     {pendingDelete === m.email ? (
                       <span className="flex items-center gap-1">

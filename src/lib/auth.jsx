@@ -5,7 +5,7 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
-  const [role, setRole] = useState(null); // 'admin' | 'member' | null(명단에 없음)
+  const [role, setRole] = useState(null); // 'admin'(운영진) | 'member'(로그인함) | null
   const [sessionReady, setSessionReady] = useState(!supabase);
   const [roleLoading, setRoleLoading] = useState(false);
 

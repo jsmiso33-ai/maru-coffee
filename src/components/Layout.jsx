@@ -61,7 +61,7 @@ function AccountMenu() {
           <p className="truncate px-3 pb-2 pt-1.5 text-xs text-muted">{user.email}</p>
           {isAdmin && (
             <Link role="menuitem" to="/members" className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm hover:bg-sunken">
-              <Users size={16} /> 부원 관리
+              <Users size={16} /> 운영진 관리
             </Link>
           )}
           <button role="menuitem" type="button" onClick={signOut} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm hover:bg-sunken">

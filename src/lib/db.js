@@ -23,7 +23,7 @@ function unwrap({ data, error }) {
 
 function friendlyError(error) {
   const msg = error?.message ?? String(error);
-  if (/row-level security|violates row-level/i.test(msg)) return '권한이 없어요. 부원 명단에 등록된 계정인지 확인해 주세요.';
+  if (/row-level security|violates row-level/i.test(msg)) return '권한이 없어요. 로그인 상태를 확인해 주세요.';
   if (/JWT|session/i.test(msg)) return '로그인이 만료됐어요. 다시 로그인해 주세요.';
   if (/Failed to fetch|NetworkError/i.test(msg)) return '네트워크 연결을 확인해 주세요.';
   return msg;
@@ -151,7 +151,7 @@ export async function deleteRecipe(id) {
   unwrap(await supabase.from('recipes').delete().eq('id', id));
 }
 
-// ───── 부원 명단 (관리자) ─────
+// ───── 운영진 명단 (관리자) ─────
 export async function listMembers() {
   return unwrap(await supabase.from('members').select('*').order('created_at', { ascending: true }));
 }
