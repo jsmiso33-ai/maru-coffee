@@ -176,7 +176,7 @@ a.desktop-nav-link:hover, .desktop-nav-link.is-current { color: var(--color-acce
 .section-head { display: flex; align-items: center; justify-content: space-between; gap: .7rem; margin-bottom: 1.1rem; }
 .section-head h2 { font-size: clamp(1.4rem, 2.2vw, 1.85rem); font-weight: 700; letter-spacing: -.055em; line-height: 1.25; }
 .section-head a { display: inline-flex; flex-shrink: 0; align-items: center; gap: .45rem; min-height: 2.75rem; color: var(--color-muted); font-size: .875rem; font-weight: 550; }
-.section-head a:hover, .recipe-row:hover b { color: var(--color-accent); }
+.section-head a:hover { color: var(--color-accent); }
 .note-card {
   display: flex; flex-direction: column; min-width: 0; height: 100%; padding: 1.25rem;
   border: 1px solid var(--color-line); border-radius: var(--radius-card); background: var(--color-surface);
@@ -188,12 +188,6 @@ a.desktop-nav-link:hover, .desktop-nav-link.is-current { color: var(--color-acce
 .note-rating { display: flex; align-items: center; gap: .28rem; color: var(--color-accent); font-weight: 700; font-variant-numeric: tabular-nums; }
 .note-signature { margin-top: auto; padding-top: .85rem; border-top: 1px solid var(--color-line); }
 .note-card > :nth-last-child(2) { margin-bottom: 1rem; }
-.recipe-list { border-top: 1px solid var(--color-line-strong); }
-.recipe-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: clamp(.7rem,2vw,2rem); padding: .95rem .25rem; border-bottom: 1px solid var(--color-line); }
-.recipe-row small, .recipe-row b { display: block; }
-.recipe-row small, .recipe-spec, .recipe-time { font-size: .8125rem; color: var(--color-muted); }
-.recipe-row b { margin-top: .15rem; font-size: 1.04rem; }
-.recipe-time { display: flex; align-items: center; justify-content: flex-end; gap: .65rem; font-variant-numeric: tabular-nums; }
 .page-heading { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: .75rem 1rem; padding-top: .25rem; margin-bottom: 1.5rem; }
 .page-title-en { color: var(--color-accent); font: italic 400 clamp(2.3rem, 4.6vw, 3.4rem)/1.05 var(--font-display); letter-spacing: -0.02em; }
 .filter-panel { padding: 1rem; background: var(--color-sunken); border-radius: var(--radius-card); }
@@ -222,8 +216,6 @@ a.desktop-nav-link:hover, .desktop-nav-link.is-current { color: var(--color-acce
 }
 @media (max-width: 24rem) {
   .cover-actions > a { padding-inline: .9rem; }
-  .recipe-spec { display: none; }
-  .recipe-row { grid-template-columns: 1fr auto; }
 }
 /* ───── 모바일(아이폰 기준) ───── */
 @media (max-width: 47.99rem) {

@@ -8,18 +8,18 @@ import { DDay } from '../components/ActivityBits.jsx';
 import { STANDARD_RECIPES } from '../data/recipes.js';
 import { Button, Card, FlavorChip, Notice, Spinner } from '../components/ui.jsx';
 import NoteCard from '../components/NoteCard.jsx';
-import { formatClock, formatDay, formatDuration, todayKey } from '../lib/format.js';
+import { formatClock, formatDay, todayKey } from '../lib/format.js';
 import brewPhoto from '../assets/hand-drip.webp';
 import { COFFEE_ORIGINS, matchOrigin } from '../data/origins.js';
 
 // 지도(d3-geo)는 홈 첫 화면 번들에서 빼고 따로 받는다
 const WorldMap = lazy(() => import('../components/WorldMap.jsx'));
 
-const featured = STANDARD_RECIPES.slice(0, 3);
+// 표지 사진 카드가 여는 표준 레시피
+const featureRecipe = STANDARD_RECIPES[0];
 
 export default function Home() {
   const { data: notes, loading, error, reload } = useAsync(listNotes, []);
-  const featureRecipe = featured[0];
 
   return (
     <div className="journal-home">
@@ -62,22 +62,6 @@ export default function Home() {
       </section>
 
       {notes && <OriginMap notes={notes} />}
-
-      <section>
-        <SectionHead title="브루잉 레시피" to="/recipes" link="레시피 전체 보기" />
-        <div className="recipe-list">
-            {featured.map((recipe) => (
-              <Link key={recipe.id} to={`/recipes/std/${recipe.id}`} className="recipe-row">
-                <span>
-                  <small>{recipe.method}</small>
-                  <b>{recipe.title}</b>
-                </span>
-                <span className="recipe-spec">원두 {recipe.dose_g}g · 물 {recipe.water_g}g</span>
-                <span className="recipe-time">{formatDuration(recipe.total_time_s)} <ArrowUpRight size={16} /></span>
-              </Link>
-            ))}
-        </div>
-      </section>
     </div>
   );
 }
