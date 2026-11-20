@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import { House, CalendarDays, NotebookPen, BookOpen, Timer, LogOut, Users, Eye, WifiOff, Download } from 'lucide-react';
 import { useInstall, useOnline } from '../lib/pwa.js';
@@ -15,6 +15,31 @@ const NAV = [
   { to: '/recipes', label: '레시피', icon: BookOpen },
   { to: '/brew', label: '계산기·타이머', short: '브루잉', icon: Timer },
 ];
+
+function NavIndicator() {
+  const ref = useRef(null);
+  const { pathname } = useLocation();
+
+  useLayoutEffect(() => {
+    const line = ref.current;
+    const nav = line.parentElement;
+    const active = nav.querySelector('a[aria-current="page"]');
+    const align = () => {
+      line.hidden = !active || !nav.clientWidth;
+      if (line.hidden) return;
+      const tab = active.getBoundingClientRect();
+      line.style.width = `${tab.width}px`;
+      line.style.transform = `translateX(${tab.left - nav.getBoundingClientRect().left}px)`;
+    };
+    align();
+    const observer = new ResizeObserver(align);
+    observer.observe(nav);
+    nav.querySelectorAll('a').forEach((link) => observer.observe(link));
+    return () => observer.disconnect();
+  }, [pathname]);
+
+  return <span ref={ref} className="nav-indicator" aria-hidden="true" />;
+}
 
 function Wordmark() {
   return (
@@ -139,7 +164,8 @@ export default function Layout() {
       <header className="sticky top-0 z-20 border-b border-line bg-paper/95 backdrop-blur">
         <div className="site-width flex h-16 items-center justify-between gap-3 md:h-[4.5rem]">
           <Wordmark />
-          <nav aria-label="주요 메뉴" className="hidden h-full items-stretch gap-2 md:flex lg:gap-5">
+          <nav aria-label="주요 메뉴" className="relative hidden h-full items-stretch gap-2 md:flex lg:gap-5">
+            <NavIndicator />
             {NAV.map(({ to, label, end }) => (
               <NavLink
                 key={to}
@@ -183,6 +209,7 @@ export default function Layout() {
 
       {/* 모바일 하단 탭 — 브루잉 중 한 손으로 이동 */}
       <nav aria-label="주요 메뉴" className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+        <NavIndicator />
         <ul className="grid grid-cols-5">
           {NAV.map(({ to, label, short, icon: Icon, end }) => (
             <li key={to}>
