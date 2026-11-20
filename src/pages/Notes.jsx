@@ -4,7 +4,7 @@ import { Plus, Search, X } from 'lucide-react';
 import { listNotes, useAsync } from '../lib/db.js';
 import { useAuth } from '../lib/auth.jsx';
 import { BREW_METHODS, PROCESSES, processOption } from '../data/options.js';
-import { Button, Card, Notice, PageHeader, Segmented, Spinner, cx } from '../components/ui.jsx';
+import { Button, Card, Notice, PageHeader, Segmented, Spinner, cx, PillSelect } from '../components/ui.jsx';
 import NoteCard from '../components/NoteCard.jsx';
 import WorldMap from '../components/WorldMap.jsx';
 import { matchOrigin } from '../data/origins.js';
@@ -91,8 +91,8 @@ export default function Notes() {
           />
         </div>
         <div className="note-filters flex flex-wrap items-center gap-2">
-          <FilterSelect label="추출 방식" value={method} onChange={(v) => update('method', v)} options={BREW_METHODS} />
-          <FilterSelect label="가공 방식" value={process} onChange={(v) => update('process', v)} options={PROCESSES} />
+          <PillSelect label="추출 방식" value={method} onChange={(v) => update('method', v)} options={BREW_METHODS} />
+          <PillSelect label="가공 방식" value={process} onChange={(v) => update('process', v)} options={PROCESSES} />
           {origin && (
             <button type="button" onClick={() => update('origin', '')} aria-label={`${origin} 산지 필터 해제`}
               className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-accent-soft px-3 text-sm font-semibold text-accent-strong">
@@ -150,26 +150,5 @@ export default function Notes() {
         )
       )}
     </>
-  );
-}
-
-const CHEVRON = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="#6f6258" stroke-width="2"><path d="m2 4 4 4 4-4"/></svg>')}")`;
-
-function FilterSelect({ label, value, onChange, options }) {
-  return (
-    <select
-      aria-label={label}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className={cx(
-        'h-11 cursor-pointer appearance-none sm:h-10 rounded-full border bg-surface pl-4 pr-9 text-sm font-semibold',
-        'bg-[position:right_0.85rem_center] bg-no-repeat',
-        value ? 'border-ink text-ink' : 'border-line text-ink-soft',
-      )}
-      style={{ backgroundImage: CHEVRON }}
-    >
-      <option value="">{label}</option>
-      {options.map((o) => <option key={o} value={o}>{o}</option>)}
-    </select>
   );
 }

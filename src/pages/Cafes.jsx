@@ -6,7 +6,7 @@ import { listCafes, useAsync } from '../lib/db.js';
 import { isConfigured } from '../lib/supabase.js';
 import { CAFE_REGIONS, CAFE_TAGS } from '../data/cafes.js';
 import NaverMapButton from '../components/NaverMapButton.jsx';
-import { Avatar, Button, Card, Notice, PageHeader, Segmented, Spinner, cx } from '../components/ui.jsx';
+import { Avatar, Button, Card, Notice, PageHeader, Segmented, Spinner, cx, PillSelect } from '../components/ui.jsx';
 
 // Leaflet(지도 라이브러리)은 이 탭에서만 받는다
 const CafeMap = lazy(() => import('../components/CafeMap.jsx'));
@@ -69,15 +69,22 @@ export default function Cafes() {
 
       {!isConfigured && <Notice>Supabase가 연결되면 부원들이 기록한 카페가 지도에 모여요.</Notice>}
 
-      {/* 지역 */}
-      {/* 지역 9칸: 모바일은 3×3 바둑판(옆으로 넘기지 않고 한눈에), PC는 한 줄 */}
-      <div className="mb-5" role="group" aria-label="지역">
-        <div className="grid grid-cols-3 gap-1.5 md:flex md:flex-wrap">
-          <RegionChip label="전국" count={all.length} active={!region} onClick={() => update('region', '')} />
-          {CAFE_REGIONS.map((r) => (
-            <RegionChip key={r} label={r} count={regionCounts.get(r) || 0} active={region === r} onClick={() => update('region', region === r ? '' : r)} />
-          ))}
-        </div>
+      {/* 지역·특징: 둥근 드롭다운 두 개 (지도 위) */}
+      <div className="mb-4 flex items-center gap-2">
+        <PillSelect
+          className="min-w-0 flex-1 md:flex-none"
+          label="지역"
+          placeholder={`전국 ${all.length}`}
+          value={region}
+          onChange={(v) => update('region', v)}
+          options={CAFE_REGIONS.map((r) => ({ value: r, label: `${r}${regionCounts.get(r) ? ` ${regionCounts.get(r)}` : ''}` }))}
+        />
+        <PillSelect className="min-w-0 flex-1 md:flex-none" label="분위기·특징" placeholder="특징 전체" value={tag} onChange={(v) => update('tag', v)} options={CAFE_TAGS} />
+        {(region || tag || kind) && (
+          <button type="button" onClick={() => { setParams({}, { replace: true }); setSelected(null); }} aria-label="필터 초기화" title="초기화" className="grid size-11 shrink-0 place-items-center rounded-full text-muted hover:bg-sunken hover:text-ink sm:size-10">
+            <X size={17} />
+          </button>
+        )}
       </div>
       {error && (
         <div className="mb-4"><Notice tone="accent" action={<Button size="sm" variant="outline" onClick={reload}>다시 시도</Button>}>{error}</Notice></div>
@@ -108,7 +115,7 @@ export default function Cafes() {
         </div>
 
         <section aria-label="카페 목록">
-          {/* 특징·정렬은 목록 바로 위에 — 지역 칩과 겹쳐 두 줄로 쌓이지 않게 */}
+          {/* 분류·정렬은 목록 바로 위에 */}
           <div className="mb-3 flex flex-wrap items-center gap-2">
             <Segmented
               label="분류"
@@ -117,26 +124,12 @@ export default function Cafes() {
               options={[{ value: '', label: '전체' }, { value: 'visited', label: '다녀온 곳' }, { value: 'wish', label: '가보고 싶은 곳' }]}
             />
             {!loading && <span className="mr-auto text-sm text-muted tnum">{cafes.length}곳</span>}
-            <select
-              aria-label="분위기·특징"
-              value={tag}
-              onChange={(e) => update('tag', e.target.value)}
-              className={cx('field h-11 w-auto py-0 pr-8 text-sm font-semibold sm:h-10', tag && 'border-ink')}
-            >
-              <option value="">특징 전체</option>
-              {CAFE_TAGS.map((t) => <option key={t} value={t}>{t}</option>)}
-            </select>
             <Segmented
               label="정렬"
               value={sort}
               onChange={(v) => update('sort', v === 'new' ? '' : v)}
               options={[{ value: 'new', label: '최신순' }, { value: 'rating', label: '별점순' }]}
             />
-            {(region || tag || kind) && (
-              <button type="button" onClick={() => { setParams({}, { replace: true }); setSelected(null); }} className="inline-flex h-11 items-center gap-1 px-1 text-sm text-muted hover:text-ink sm:h-10">
-                <X size={15} /> 초기화
-              </button>
-            )}
           </div>
           {loading ? (
             <Spinner />
@@ -162,23 +155,6 @@ export default function Cafes() {
         </section>
       </div>
     </>
-  );
-}
-
-function RegionChip({ label, count, active, onClick }) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={cx(
-        'inline-flex h-10 min-w-0 items-center justify-center gap-1 rounded-full border px-2 text-sm whitespace-nowrap transition-colors md:h-9 md:px-3.5',
-        active ? 'border-ink bg-ink font-semibold text-paper' : 'border-line bg-surface text-ink-soft hover:border-line-strong',
-      )}
-    >
-      {label}
-      {count > 0 && <span className={cx('text-xs tnum', active ? 'text-paper/70' : 'text-muted')}>{count}</span>}
-    </button>
   );
 }
 

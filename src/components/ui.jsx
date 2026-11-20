@@ -234,4 +234,30 @@ export function Segmented({ options, value, onChange, label }) {
   );
 }
 
+const CHEVRON = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="#6f6258" stroke-width="2"><path d="m2 4 4 4 4-4"/></svg>')}")`;
+
+// 둥근 드롭다운 필터. options: 문자열 또는 { value, label }. 첫 줄(빈 값)은 placeholder
+export function PillSelect({ label, placeholder = label, value, onChange, options, className }) {
+  return (
+    <select
+      aria-label={label}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className={cx(
+        'h-11 cursor-pointer appearance-none rounded-full border bg-surface pl-4 pr-9 text-sm font-semibold sm:h-10',
+        'bg-[position:right_0.85rem_center] bg-no-repeat',
+        value ? 'border-ink text-ink' : 'border-line text-ink-soft',
+        className,
+      )}
+      style={{ backgroundImage: CHEVRON }}
+    >
+      <option value="">{placeholder}</option>
+      {options.map((o) => {
+        const opt = typeof o === 'string' ? { value: o, label: o } : o;
+        return <option key={opt.value} value={opt.value}>{opt.label}</option>;
+      })}
+    </select>
+  );
+}
+
 export { cx };
