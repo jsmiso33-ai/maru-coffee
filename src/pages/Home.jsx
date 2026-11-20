@@ -1,6 +1,6 @@
 import { Suspense, lazy, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router';
-import { ArrowRight, ArrowUpRight, BookOpen, Calculator, Clock, MapPin, NotebookPen, Plus, Timer } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, BookOpen, Clock, MapPin, NotebookPen, Plus } from 'lucide-react';
 import { CLUB } from '../lib/config.js';
 import { listActivities, listNotes, useAsync } from '../lib/db.js';
 import { useAuth } from '../lib/auth.jsx';
@@ -30,7 +30,7 @@ export default function Home() {
           <p className="cover-intro">{CLUB.intro}</p>
           <div className="cover-actions">
             <Button to="/notes/new" variant="accent"><NotebookPen size={17} /> 노트 쓰기</Button>
-            <Button to="/brew#brew-timer" variant="outline"><Timer size={17} /> 브루잉 타이머</Button>
+            <Button to="/cafes" variant="outline"><MapPin size={17} /> 카페 지도</Button>
           </div>
         </div>
         <Link to={`/recipes/std/${featureRecipe.id}`} className="cover-photo" aria-label={`${featureRecipe.title} 레시피 보기`}>
@@ -64,9 +64,8 @@ export default function Home() {
       {notes && <OriginMap notes={notes} />}
 
       <section>
-        <SectionHead title="브루잉 레시피와 도구" to="/recipes" link="레시피 전체 보기" />
-        <div className="brew-shelf">
-          <div className="recipe-list">
+        <SectionHead title="브루잉 레시피" to="/recipes" link="레시피 전체 보기" />
+        <div className="recipe-list">
             {featured.map((recipe) => (
               <Link key={recipe.id} to={`/recipes/std/${recipe.id}`} className="recipe-row">
                 <span>
@@ -77,12 +76,6 @@ export default function Home() {
                 <span className="recipe-time">{formatDuration(recipe.total_time_s)} <ArrowUpRight size={16} /></span>
               </Link>
             ))}
-          </div>
-          <Link to="/brew" className="brew-tool">
-            <Calculator size={25} strokeWidth={1.5} />
-            <div><h3>브루잉 계산기</h3><p>원두 양에 맞춰 물의 양과 붓는 간격을 계산해요.</p></div>
-            <span>계산기 열기 <ArrowRight size={15} /></span>
-          </Link>
         </div>
       </section>
     </div>

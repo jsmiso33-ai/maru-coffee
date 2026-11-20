@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
-import { House, CalendarDays, NotebookPen, BookOpen, Timer, LogOut, Users, Eye, WifiOff, Download, Coffee, Images } from 'lucide-react';
+import { House, CalendarDays, NotebookPen, BookOpen, LogOut, Users, Eye, WifiOff, Download, Coffee, Images } from 'lucide-react';
 import { useInstall, useOnline } from '../lib/pwa.js';
 import InstallPrompt, { IosSteps } from './InstallPrompt.jsx';
 import { useAuth } from '../lib/auth.jsx';
@@ -14,7 +14,6 @@ const NAV = [
   { to: '/notes', label: '테이스팅 노트', short: '노트', icon: NotebookPen },
   { to: '/cafes', label: '카페 지도', short: '카페', icon: Coffee },
   { to: '/recipes', label: '레시피', icon: BookOpen },
-  { to: '/brew', label: '계산기·타이머', short: '브루잉', icon: Timer, disabled: true },
   { to: '/gallery', label: '갤러리', icon: Images },
 ];
 
@@ -147,7 +146,7 @@ function PreviewInfo() {
         <Eye size={15} /> 미리보기
       </button>
       <div id="preview-info" hidden={!open} className="preview-info">
-        샘플 노트를 둘러볼 수 있어요. 표준 레시피, 계산기와 타이머는 바로 사용할 수 있어요.
+        샘플 노트를 둘러볼 수 있어요. 표준 레시피와 레시피 타이머는 바로 사용할 수 있어요.
       </div>
     </div>
   );
@@ -226,7 +225,7 @@ function OfflineNotice() {
   return (
     <div className="site-width pt-4" role="status">
       <Notice icon={WifiOff}>
-        <strong className="font-semibold">오프라인</strong> — 노트·활동은 연결되면 다시 불러와요. 계산기·타이머·표준 레시피는 그대로 쓸 수 있어요.
+        <strong className="font-semibold">오프라인</strong> — 노트·활동은 연결되면 다시 불러와요. 표준 레시피와 레시피 타이머는 그대로 쓸 수 있어요.
       </Notice>
     </div>
   );

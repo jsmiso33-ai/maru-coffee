@@ -47,7 +47,7 @@ function MemberRecipes() {
     return (
       <Card className="px-6 py-14 text-center">
         <p className="font-semibold">아직 공유된 레시피가 없어요</p>
-        <p className="mt-1 text-sm text-muted">계산기에서 만든 레시피를 그대로 저장할 수도 있어요.</p>
+        <p className="mt-1 text-sm text-muted">자주 쓰는 내 레시피를 올려 부원들과 나눠 보세요.</p>
       </Card>
     );
   }

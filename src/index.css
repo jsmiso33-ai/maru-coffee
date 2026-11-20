@@ -187,18 +187,12 @@ a.desktop-nav-link:hover, .desktop-nav-link.is-current { color: var(--color-acce
 .note-rating { display: flex; align-items: center; gap: .28rem; color: var(--color-accent); font-weight: 700; font-variant-numeric: tabular-nums; }
 .note-signature { margin-top: auto; padding-top: .85rem; border-top: 1px solid var(--color-line); }
 .note-card > :nth-last-child(2) { margin-bottom: 1rem; }
-.brew-shelf { display: grid; grid-template-columns: 1.7fr 1fr; gap: 1.5rem; }
 .recipe-list { border-top: 1px solid var(--color-line-strong); }
 .recipe-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: clamp(.7rem,2vw,2rem); padding: .95rem .25rem; border-bottom: 1px solid var(--color-line); }
 .recipe-row small, .recipe-row b { display: block; }
 .recipe-row small, .recipe-spec, .recipe-time { font-size: .8125rem; color: var(--color-muted); }
 .recipe-row b { margin-top: .15rem; font-size: 1.04rem; }
 .recipe-time { display: flex; align-items: center; justify-content: flex-end; gap: .65rem; font-variant-numeric: tabular-nums; }
-.brew-tool { display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1.5rem; background: var(--color-accent); color: #fffaf4; border-radius: var(--radius-card); }
-.brew-tool:hover { background: var(--color-accent-strong); }
-.brew-tool h3 { font-weight: 650; font-size: 1.4rem; letter-spacing: -.04em; }
-.brew-tool p { margin-top: .3rem; font-size: .9rem; }
-.brew-tool > span { display: inline-flex; align-items: center; gap: .5rem; font-size: .875rem; }
 .page-heading { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1rem; padding-block: .6rem 1.7rem; border-bottom: 1px solid var(--color-line); margin-bottom: 1.6rem; }
 .page-kicker { margin-bottom: .5rem; color: var(--color-accent); font: italic 1.2rem/1.25 var(--font-display); }
 .filter-panel { padding: 1rem; background: var(--color-sunken); border-radius: var(--radius-card); }
@@ -220,7 +214,6 @@ a.desktop-nav-link:hover, .desktop-nav-link.is-current { color: var(--color-acce
   .popular-flavors > p { flex-shrink: 0; }
   .popular-flavors > div { column-gap: .25rem; }
   .section-head { margin-bottom: .75rem; }
-  .brew-shelf { grid-template-columns: 1fr; }
 }
 @media (max-width: 24rem) {
   .cover-actions > a { padding-inline: .9rem; }
@@ -233,10 +226,6 @@ a.desktop-nav-link:hover, .desktop-nav-link.is-current { color: var(--color-acce
   .note-filters > div:last-child { grid-column: 1 / -1; }
 }
 @media (max-width: 26rem) {
-  .brew-quantities { grid-template-columns: 1fr; }
-  .brew-quantities > span { display: none; }
-  .brew-quantities > div { display: grid; grid-template-columns: minmax(4.5rem, 1fr) minmax(0, 2.5fr); align-items: center; gap: .5rem; }
-  .brew-quantities button { min-width: 2.75rem; height: 3rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

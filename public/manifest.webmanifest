@@ -1,7 +1,7 @@
 {
   "name": "MARU · 고려대 스페셜티 커피 소모임",
   "short_name": "MARU",
-  "description": "테이스팅 노트, 활동 캘린더, 브루잉 레시피와 계산기·타이머",
+  "description": "테이스팅 노트, 활동 캘린더, 카페 지도, 브루잉 레시피",
   "lang": "ko",
   "id": "./",
   "start_url": "./",
@@ -17,7 +17,7 @@
     { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "브루잉 타이머", "short_name": "타이머", "url": "./brew", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "카페 지도", "short_name": "카페", "url": "./cafes", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
     { "name": "테이스팅 노트 쓰기", "short_name": "노트 쓰기", "url": "./notes/new", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
     { "name": "활동 캘린더", "short_name": "활동", "url": "./activities", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
   ]

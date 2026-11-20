@@ -45,7 +45,7 @@ export default function InstallPrompt() {
         <div className="min-w-0 flex-1">
           <p className="font-bold">MARU를 앱으로 쓰기</p>
           {mode === 'prompt' ? (
-            <p className="mt-0.5 text-sm text-muted">홈 화면에서 바로 열리고, 인터넷이 없어도 타이머·계산기를 쓸 수 있어요.</p>
+            <p className="mt-0.5 text-sm text-muted">홈 화면에서 바로 열리고, 인터넷이 없어도 표준 레시피와 타이머를 쓸 수 있어요.</p>
           ) : (
             <IosSteps />
           )}

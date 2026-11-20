@@ -1,6 +1,6 @@
 import { StrictMode, lazy } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Route, Routes } from 'react-router';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import './index.css';
 import { AuthProvider } from './lib/auth.jsx';
 import { registerServiceWorker } from './lib/pwa.js';
@@ -29,7 +29,6 @@ const NoteForm = page(() => import('./pages/NoteForm.jsx'));
 const Recipes = page(() => import('./pages/Recipes.jsx'));
 const RecipeDetail = page(() => import('./pages/RecipeDetail.jsx'));
 const RecipeForm = page(() => import('./pages/RecipeForm.jsx'));
-const Brew = page(() => import('./pages/Brew.jsx'));
 const Members = page(() => import('./pages/Members.jsx'));
 const Privacy = page(() => import('./pages/Privacy.jsx'));
 const Activities = page(() => import('./pages/Activities.jsx'));
@@ -68,7 +67,8 @@ createRoot(document.getElementById('root')).render(
             <Route path="recipes/std/:id" element={<RecipeDetail standard />} />
             <Route path="recipes/:id" element={<RecipeDetail />} />
             <Route path="recipes/:id/edit" element={<RecipeForm />} />
-            <Route path="brew" element={<Brew />} />
+            {/* 계산기·타이머 탭은 없앴다 — 예전 링크·앱 바로가기는 레시피로 */}
+            <Route path="brew" element={<Navigate to="/recipes" replace />} />
             <Route path="members" element={<Members />} />
             <Route path="privacy" element={<Privacy />} />
             <Route path="*" element={<NotFound what="페이지" />} />

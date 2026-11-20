@@ -149,14 +149,3 @@ export const STANDARD_RECIPES = [
 export function findStandardRecipe(id) {
   return STANDARD_RECIPES.find((r) => r.id === id) ?? null;
 }
-
-// 계산기 프리셋: 방식별 기본 비율(물/원두)·뜸 배수·붓기 횟수
-export const BREW_PRESETS = [
-  { method: 'V60', ratio: 15, bloomX: 2.5, pours: 4, temp: 93, time: 180, interval: 30 },
-  { method: '칼리타', ratio: 16, bloomX: 2, pours: 3, temp: 93, time: 210, interval: 35 },
-  { method: '케멕스', ratio: 16.5, bloomX: 2, pours: 3, temp: 94, time: 270, interval: 45 },
-  { method: '에어로프레스', ratio: 14.5, bloomX: 0, pours: 1, temp: 90, time: 150, interval: 0 },
-  { method: '프렌치프레스', ratio: 16.5, bloomX: 0, pours: 1, temp: 95, time: 540, interval: 0 },
-  { method: '에스프레소', ratio: 2, bloomX: 0, pours: 1, temp: 93, time: 30, interval: 0 },
-  { method: '콜드브루', ratio: 10, bloomX: 0, pours: 1, temp: 20, time: 14 * 3600, interval: 0 },
-];
