@@ -82,3 +82,17 @@ export function dDayLabel(key) {
   if (n === 1) return '내일';
   return n > 0 ? `D-${n}` : `${-n}일 전`;
 }
+
+// 댓글 시각: "방금", "12분 전", "3시간 전", "어제", 일주일 넘으면 날짜
+export function timeAgo(value) {
+  const t = new Date(value).getTime();
+  if (Number.isNaN(t)) return '';
+  const sec = Math.max(0, (Date.now() - t) / 1000);
+  if (sec < 60) return '방금';
+  if (sec < 3600) return `${Math.floor(sec / 60)}분 전`;
+  if (sec < 86400) return `${Math.floor(sec / 3600)}시간 전`;
+  const days = Math.floor(sec / 86400);
+  if (days === 1) return '어제';
+  if (days < 7) return `${days}일 전`;
+  return formatDate(value);
+}

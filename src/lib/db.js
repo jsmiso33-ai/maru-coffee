@@ -30,9 +30,15 @@ function friendlyError(error) {
 }
 
 // ───── 테이스팅 노트 ─────
+// 목록 카드에 댓글 수를 보여 주려고 함께 센다 → note.comments = [{ count }]
+const COMMENT_COUNT = 'comments:note_comments(count)';
+
+export function commentCount(note) {
+  return note?.comments?.[0]?.count ?? 0;
+}
 export async function listNotes() {
   if (!supabase) return SAMPLE_NOTES;
-  return unwrap(await supabase.from('tasting_notes').select('*').order('created_at', { ascending: false }).limit(500));
+  return unwrap(await supabase.from('tasting_notes').select(`*, ${COMMENT_COUNT}`).order('created_at', { ascending: false }).limit(500));
 }
 
 export async function getNote(id) {
@@ -54,7 +60,7 @@ export async function deleteNote(id) {
 
 export async function listNotesForActivity(activityId) {
   if (!supabase) return [];
-  return unwrap(await supabase.from('tasting_notes').select('*').eq('activity_id', activityId).order('created_at', { ascending: true }));
+  return unwrap(await supabase.from('tasting_notes').select(`*, ${COMMENT_COUNT}`).eq('activity_id', activityId).order('created_at', { ascending: true }));
 }
 
 // ───── 활동 (일자별 모임) ─────
@@ -104,6 +110,24 @@ export async function saveActivity(activity, beans, id) {
 
 export async function deleteActivity(id) {
   unwrap(await supabase.from('activities').delete().eq('id', id));
+}
+
+// ───── 노트 댓글 ─────
+export async function listComments(noteId) {
+  if (!supabase) return [];
+  return unwrap(await supabase.from('note_comments').select('*').eq('note_id', noteId).order('created_at', { ascending: true }));
+}
+
+export async function addComment(noteId, body) {
+  return unwrap(await supabase.from('note_comments').insert({ note_id: noteId, body: body.trim() }).select().single());
+}
+
+export async function updateComment(id, body) {
+  return unwrap(await supabase.from('note_comments').update({ body: body.trim() }).eq('id', id).select().single());
+}
+
+export async function deleteComment(id) {
+  unwrap(await supabase.from('note_comments').delete().eq('id', id));
 }
 
 // ───── 부원 레시피 ─────

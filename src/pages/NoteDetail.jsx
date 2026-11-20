@@ -6,6 +6,7 @@ import { useAuth } from '../lib/auth.jsx';
 import { ATTRIBUTES } from '../data/options.js';
 import { Avatar, Button, Card, FlavorChip, Notice, Spinner, Stars } from '../components/ui.jsx';
 import { NotFound } from './NotFound.jsx';
+import Comments from '../components/Comments.jsx';
 import RadarChart from '../components/RadarChart.jsx';
 import { formatDate, formatDay } from '../lib/format.js';
 
@@ -146,6 +147,8 @@ export default function NoteDetail() {
           )}
         </div>
       )}
+
+      <Comments note={note} />
     </article>
   );
 }

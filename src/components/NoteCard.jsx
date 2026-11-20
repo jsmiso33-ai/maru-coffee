@@ -1,8 +1,9 @@
 import { Link } from 'react-router';
-import { Star } from 'lucide-react';
+import { MessageCircle, Star } from 'lucide-react';
 import { Avatar, FlavorChip } from './ui.jsx';
 import RadarChart from './RadarChart.jsx';
 import { formatDate } from '../lib/format.js';
+import { commentCount } from '../lib/db.js';
 
 export default function NoteCard({ note }) {
   const meta = [note.origin, note.process, note.roast_level].filter(Boolean).join(' · ');
@@ -41,6 +42,11 @@ export default function NoteCard({ note }) {
           <Avatar name={note.author_name} src={note.author_avatar} size={24} />
           <span className="truncate font-medium text-ink-soft">{note.author_name}</span>
         </span>
+        {commentCount(note) > 0 && (
+          <span className="ml-auto inline-flex shrink-0 items-center gap-1 text-xs text-muted tnum" aria-label={`댓글 ${commentCount(note)}개`}>
+            <MessageCircle size={13} /> {commentCount(note)}
+          </span>
+        )}
         <time className="shrink-0 text-xs text-muted tnum" dateTime={(note.tasted_on || note.created_at)?.slice(0, 10)}>{formatDate(note.tasted_on || note.created_at)}</time>
       </div>
     </Link>
