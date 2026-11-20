@@ -190,15 +190,20 @@ export function Notice({ tone = 'neutral', icon: Icon, children, action }) {
   );
 }
 
-// 페이지 제목: 제목 + (같은 줄에) 크림슨 영문 소제목 + 짧은 설명 한 줄 + 오른쪽 버튼
+// 페이지 제목: 크림슨 영문 제목(크게) + 한국어 설명 한 줄 + 오른쪽 버튼.
+// 한국어 제목은 화면에서는 숨기고 스크린리더·검색용으로만 남긴다.
 export function PageHeader({ eyebrow, title, children, action }) {
   return (
     <header className="page-heading">
       <div className="min-w-0">
-        <h1 className="flex flex-wrap items-baseline gap-x-3 text-[clamp(1.7rem,3vw,2.3rem)] font-bold leading-tight tracking-[-0.05em]">
-          {title}
-          {eyebrow && <span className="page-kicker" aria-hidden>{eyebrow}</span>}
-        </h1>
+        {eyebrow ? (
+          <h1 className="page-title-en">
+            <span className="sr-only">{title}</span>
+            <span aria-hidden>{eyebrow}</span>
+          </h1>
+        ) : (
+          <h1 className="text-[clamp(1.7rem,3vw,2.3rem)] font-bold leading-tight tracking-[-0.05em]">{title}</h1>
+        )}
         {children && <p className="mt-1.5 max-w-xl text-[0.95rem] leading-relaxed text-muted">{children}</p>}
       </div>
       {action}
