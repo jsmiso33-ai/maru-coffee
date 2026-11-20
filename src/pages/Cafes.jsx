@@ -1,12 +1,12 @@
 import { Suspense, lazy, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
-import { Heart, LocateFixed, MapPin, Plus, Star, X } from 'lucide-react';
+import { ChevronDown, Heart, LocateFixed, MapPin, Plus, Star, X } from 'lucide-react';
 import { photoUrl } from '../lib/photos.js';
 import { listCafes, useAsync } from '../lib/db.js';
 import { isConfigured } from '../lib/supabase.js';
 import { CAFE_REGIONS, CAFE_TAGS } from '../data/cafes.js';
 import NaverMapButton from '../components/NaverMapButton.jsx';
-import { Avatar, Button, Card, Notice, PageHeader, Segmented, Spinner, cx, PillSelect } from '../components/ui.jsx';
+import { Avatar, Button, Card, Notice, PageHeader, Spinner, cx, PillSelect } from '../components/ui.jsx';
 
 // Leaflet(지도 라이브러리)은 이 탭에서만 받는다
 const CafeMap = lazy(() => import('../components/CafeMap.jsx'));
@@ -38,14 +38,21 @@ export default function Cafes() {
     return m;
   }, [all]);
 
+  // 지역·특징으로 거른 뒤, 탭(전체/다녀온 곳/가보고 싶은 곳)별 개수를 같이 센다
+  const scoped = useMemo(
+    () => all.filter((c) => (!region || c.region === region) && (!tag || c.tagList.includes(tag))),
+    [all, region, tag],
+  );
+  const kindCounts = {
+    '': scoped.length,
+    visited: scoped.filter((c) => c.reviewCount > 0).length,
+    wish: scoped.filter((c) => c.wishCount > 0).length,
+  };
   const cafes = useMemo(() => {
-    const list = all.filter((c) => (!region || c.region === region)
-      && (!tag || c.tagList.includes(tag))
-      && (kind !== 'visited' || c.reviewCount > 0)
-      && (kind !== 'wish' || c.wishCount > 0));
+    const list = scoped.filter((c) => (kind !== 'visited' || c.reviewCount > 0) && (kind !== 'wish' || c.wishCount > 0));
     if (sort === 'rating') list.sort((a, b) => (b.avgRating ?? -1) - (a.avgRating ?? -1) || b.created_at.localeCompare(a.created_at));
     return list;
-  }, [all, region, tag, sort, kind]);
+  }, [scoped, sort, kind]);
 
   const locate = () => {
     if (!('geolocation' in navigator)) return setLocError('이 브라우저는 위치 찾기를 지원하지 않아요.');
@@ -115,21 +122,38 @@ export default function Cafes() {
         </div>
 
         <section aria-label="카페 목록">
-          {/* 분류·정렬은 목록 바로 위에 */}
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            <Segmented
-              label="분류"
-              value={kind}
-              onChange={(v) => update('kind', v)}
-              options={[{ value: '', label: '전체' }, { value: 'visited', label: '다녀온 곳' }, { value: 'wish', label: '가보고 싶은 곳' }]}
-            />
-            {!loading && <span className="mr-auto text-sm text-muted tnum">{cafes.length}곳</span>}
-            <Segmented
-              label="정렬"
-              value={sort}
-              onChange={(v) => update('sort', v === 'new' ? '' : v)}
-              options={[{ value: 'new', label: '최신순' }, { value: 'rating', label: '별점순' }]}
-            />
+          {/* 분류는 밑줄 탭(개수 포함), 정렬은 오른쪽 작은 글자 — 한 줄로 */}
+          <div className="mb-3 flex items-center justify-between gap-3 border-b border-line">
+            <div role="tablist" aria-label="분류" className="flex gap-4">
+              {[['', '전체'], ['visited', '다녀온 곳'], ['wish', '가보고 싶은 곳']].map(([v, label]) => (
+                <button
+                  key={v || 'all'}
+                  type="button"
+                  role="tab"
+                  aria-selected={kind === v}
+                  onClick={() => update('kind', v)}
+                  className={cx(
+                    '-mb-px inline-flex h-11 items-center gap-1 border-b-2 text-sm font-semibold whitespace-nowrap transition-colors',
+                    kind === v ? 'border-accent text-ink' : 'border-transparent text-muted hover:text-ink',
+                  )}
+                >
+                  {label}
+                  {!loading && <span className={cx('text-xs tnum', kind === v ? 'text-accent' : 'text-muted')}>{kindCounts[v]}</span>}
+                </button>
+              ))}
+            </div>
+            <label className="relative shrink-0">
+              <span className="sr-only">정렬</span>
+              <select
+                value={sort}
+                onChange={(e) => update('sort', e.target.value === 'new' ? '' : e.target.value)}
+                className="h-8 cursor-pointer appearance-none bg-transparent pr-5 text-sm font-semibold text-ink-soft"
+              >
+                <option value="new">최신순</option>
+                <option value="rating">별점순</option>
+              </select>
+              <ChevronDown size={14} className="pointer-events-none absolute right-0 top-1/2 -translate-y-1/2 text-muted" />
+            </label>
           </div>
           {loading ? (
             <Spinner />
