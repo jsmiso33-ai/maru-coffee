@@ -206,7 +206,8 @@ export function PageHeader({ eyebrow, title, children, action }) {
         )}
         {children && <p className="mt-1.5 max-w-xl text-[0.95rem] leading-relaxed text-muted">{children}</p>}
       </div>
-      {action}
+      {/* 모바일에서는 오른쪽 아래 떠 있는 버튼(엄지 닿는 곳)으로 — index.css .page-action */}
+      {action && <div className="page-action">{action}</div>}
     </header>
   );
 }

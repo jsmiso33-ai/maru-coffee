@@ -168,7 +168,7 @@ function FilterSelect({ label, value, onChange, options }) {
       )}
       style={{ backgroundImage: CHEVRON }}
     >
-      <option value="">{label} 전체</option>
+      <option value="">{label}</option>
       {options.map((o) => <option key={o} value={o}>{o}</option>)}
     </select>
   );

@@ -76,7 +76,7 @@ function RecipeGrid({ recipes, hrefOf, showAuthor }) {
               ['온도', r.water_temp != null ? `${r.water_temp}°` : '—'],
             ].map(([k, v]) => (
               <div key={k}>
-                <dt className="text-[0.7rem] text-muted">{k}</dt>
+                <dt className="text-xs text-muted">{k}</dt>
                 <dd className="mt-0.5 text-sm font-semibold tnum">{v}</dd>
               </div>
             ))}

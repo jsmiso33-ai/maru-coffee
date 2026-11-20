@@ -185,7 +185,7 @@ export default function Layout() {
 
       <OfflineNotice />
 
-      <main id="main" className="site-width pb-16 pt-6 sm:pt-9">
+      <main id="main" className="site-width pb-28 pt-5 sm:pt-9 md:pb-16">
         <Suspense fallback={<Spinner />}>
           <Outlet />
         </Suspense>

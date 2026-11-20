@@ -65,7 +65,7 @@ export default function Cafes() {
       {!isConfigured && <Notice>Supabase가 연결되면 부원들이 기록한 카페가 지도에 모여요.</Notice>}
 
       {/* 지역 */}
-      <div className="mb-5 overflow-x-auto [scrollbar-width:none]" role="group" aria-label="지역">
+      <div className="-mx-[1.125rem] mb-5 overflow-x-auto px-[1.125rem] [scrollbar-width:none] md:mx-0 md:px-0" role="group" aria-label="지역">
         <div className="flex w-max gap-1.5">
           <RegionChip label="전국" count={all.length} active={!region} onClick={() => update('region', '')} />
           {CAFE_REGIONS.map((r) => (
@@ -79,13 +79,13 @@ export default function Cafes() {
 
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         <div className="relative lg:sticky lg:top-24">
-          <Suspense fallback={<div className="h-[52vh] min-h-80 animate-pulse rounded-[var(--radius-card)] bg-sunken lg:h-[calc(100vh-8rem)]" />}>
+          <Suspense fallback={<div className="h-[46vh] min-h-72 animate-pulse rounded-[var(--radius-card)] bg-sunken lg:h-[calc(100vh-8rem)]" />}>
             <CafeMap
               cafes={cafes}
               selectedId={selected?.id}
               onSelect={setSelected}
               focus={focus}
-              className="h-[52vh] min-h-80 lg:h-[calc(100vh-8rem)]"
+              className="h-[46vh] min-h-72 lg:h-[calc(100vh-8rem)]"
             />
           </Suspense>
           <button
