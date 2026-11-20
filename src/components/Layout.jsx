@@ -1,10 +1,12 @@
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
-import { House, CalendarDays, NotebookPen, BookOpen, Timer, LogOut, Users, Eye } from 'lucide-react';
+import { House, CalendarDays, NotebookPen, BookOpen, Timer, LogOut, Users, Eye, WifiOff, Download } from 'lucide-react';
+import { useInstall, useOnline } from '../lib/pwa.js';
+import InstallPrompt, { IosSteps } from './InstallPrompt.jsx';
 import { useAuth } from '../lib/auth.jsx';
 import { isConfigured } from '../lib/supabase.js';
 import { CLUB } from '../lib/config.js';
-import { Avatar, Spinner, cx } from './ui.jsx';
+import { Avatar, Notice, Spinner, cx } from './ui.jsx';
 
 const NAV = [
   { to: '/', label: '홈', icon: House, end: true },
@@ -156,6 +158,8 @@ export default function Layout() {
         </div>
       </header>
 
+      <OfflineNotice />
+
       <main id="main" className="site-width pb-16 pt-6 sm:pt-9">
         <Suspense fallback={<Spinner />}>
           <Outlet />
@@ -169,10 +173,13 @@ export default function Layout() {
             {CLUB.instagram && (
               <a href={`https://instagram.com/${CLUB.instagram}`} target="_blank" rel="noreferrer" className="-my-3 py-3 hover:text-ink">@{CLUB.instagram}</a>
             )}
+            <InstallLink />
             <Link to="/privacy" className="-my-3 py-3 hover:text-ink">개인정보처리방침</Link>
           </div>
         </div>
       </footer>
+
+      {pathname === '/' && <InstallPrompt />}
 
       {/* 모바일 하단 탭 — 브루잉 중 한 손으로 이동 */}
       <nav aria-label="주요 메뉴" className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
@@ -194,6 +201,53 @@ export default function Layout() {
           ))}
         </ul>
       </nav>
+    </div>
+  );
+}
+
+function OfflineNotice() {
+  const online = useOnline();
+  if (online) return null;
+  return (
+    <div className="site-width pt-4" role="status">
+      <Notice icon={WifiOff}>
+        <strong className="font-semibold">오프라인</strong> — 노트·활동은 연결되면 다시 불러와요. 계산기·타이머·표준 레시피는 그대로 쓸 수 있어요.
+      </Notice>
+    </div>
+  );
+}
+
+// 바닥글의 "앱으로 설치": 안내 배너를 닫은 사람도 언제든 설치할 수 있게
+function InstallLink() {
+  const { mode, install } = useInstall();
+  const [open, setOpen] = useState(false);
+  if (mode === 'installed' || mode === 'none') return null;
+  if (mode === 'prompt') {
+    return (
+      <button type="button" onClick={install} className="-my-3 inline-flex items-center gap-1 py-3 hover:text-ink">
+        <Download size={14} /> 앱으로 설치
+      </button>
+    );
+  }
+  return (
+    <div className="relative">
+      <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="-my-3 inline-flex items-center gap-1 py-3 hover:text-ink">
+        <Download size={14} /> 앱으로 설치
+      </button>
+      {open && (
+        <div className="absolute bottom-full right-0 z-30 mb-3 w-64 rounded-2xl border border-line bg-surface p-4 text-left shadow-[var(--shadow-card)]">
+          {mode === 'ios' ? (
+            <>
+              <span className="block font-semibold text-ink">홈 화면에 추가하기</span>
+              <IosSteps />
+            </>
+          ) : (
+            <span className="block text-sm text-ink-soft">
+              카카오톡·인스타그램 안에서는 설치할 수 없어요. 오른쪽 위 메뉴에서 <strong className="font-semibold text-ink">다른 브라우저로 열기</strong>를 누른 뒤 설치해 주세요.
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
 }

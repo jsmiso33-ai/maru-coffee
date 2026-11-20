@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import './index.css';
 import { AuthProvider } from './lib/auth.jsx';
+import { registerServiceWorker } from './lib/pwa.js';
 import Layout from './components/Layout.jsx';
 import Home from './pages/Home.jsx';
 // 배포 직후엔 브라우저에 캐시된 옛 HTML이 지워진 청크를 찾다 실패할 수 있다 → 한 번만 새로고침
@@ -36,6 +37,8 @@ const ActivityDetail = page(() => import('./pages/ActivityDetail.jsx'));
 const ActivityForm = page(() => import('./pages/ActivityForm.jsx'));
 
 // GitHub Pages는 SPA 라우팅을 모르므로 빌드 후 tools/postbuild.mjs가 index.html을 404.html 등으로 복사한다.
+registerServiceWorker();
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AuthProvider>
