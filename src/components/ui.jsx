@@ -12,7 +12,7 @@ const BUTTON = {
   danger: 'text-accent hover:bg-accent-soft',
 };
 
-export function Button({ variant = 'primary', size = 'md', to, className, children, ...rest }) {
+export function Button({ variant = 'primary', size = 'md', to, href, className, children, ...rest }) {
   const cls = cx(
     'inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors active:translate-y-px disabled:opacity-50 disabled:pointer-events-none select-none',
     size === 'sm' ? 'h-11 px-4 text-sm sm:h-9 sm:px-3.5' : size === 'lg' ? 'h-13 px-6 text-base' : 'h-11 px-5 text-[0.95rem]',
@@ -20,6 +20,8 @@ export function Button({ variant = 'primary', size = 'md', to, className, childr
     className,
   );
   if (to) return <Link to={to} className={cls} {...rest}>{children}</Link>;
+  // 외부 링크(카카오맵 등)는 새 탭으로
+  if (href) return <a href={href} target="_blank" rel="noreferrer" className={cls} {...rest}>{children}</a>;
   return <button type="button" className={cls} {...rest}>{children}</button>;
 }
 

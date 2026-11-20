@@ -26,6 +26,7 @@ function friendlyError(error) {
   if (/row-level security|violates row-level/i.test(msg)) return '권한이 없어요. 로그인 상태를 확인해 주세요.';
   if (/JWT|session/i.test(msg)) return '로그인이 만료됐어요. 다시 로그인해 주세요.';
   if (/Failed to fetch|NetworkError/i.test(msg)) return '네트워크 연결을 확인해 주세요.';
+  if (/schema cache|does not exist/i.test(msg)) return '아직 준비 중인 기능이에요. 운영진이 데이터베이스 설정을 마치면 열려요.';
   return msg;
 }
 
@@ -128,6 +129,29 @@ export async function updateComment(id, body) {
 
 export async function deleteComment(id) {
   unwrap(await supabase.from('note_comments').delete().eq('id', id));
+}
+
+// ───── 카페 지도 ─────
+const CAFE_FIELDS = ['name', 'address', 'region', 'lat', 'lng', 'rating', 'tags', 'signature', 'memo', 'link', 'visited_on'];
+
+export async function listCafes() {
+  if (!supabase) return [];
+  return unwrap(await supabase.from('cafes').select('*').order('created_at', { ascending: false }).limit(1000));
+}
+
+export async function getCafe(id) {
+  if (!supabase) return null;
+  return unwrap(await supabase.from('cafes').select('*').eq('id', id).maybeSingle());
+}
+
+export async function saveCafe(cafe, id) {
+  const row = pick(cafe, CAFE_FIELDS);
+  const q = id ? supabase.from('cafes').update(row).eq('id', id) : supabase.from('cafes').insert(row);
+  return unwrap(await q.select().single());
+}
+
+export async function deleteCafe(id) {
+  unwrap(await supabase.from('cafes').delete().eq('id', id));
 }
 
 // ───── 부원 레시피 ─────

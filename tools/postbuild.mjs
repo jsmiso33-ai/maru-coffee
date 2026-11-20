@@ -7,7 +7,7 @@ import { copyFileSync, mkdirSync, readFileSync, readdirSync, statSync, writeFile
 import { createHash } from 'node:crypto';
 import { join, relative } from 'node:path';
 
-const STATIC_ROUTES = ['privacy', 'activities', 'notes', 'recipes', 'brew'];
+const STATIC_ROUTES = ['privacy', 'activities', 'notes', 'cafes', 'recipes', 'brew'];
 
 // 라우트 폴더 복사본·404.html은 index.html과 같으므로 미리 받을 목록에서 뺀다
 function listFiles(dir) {
