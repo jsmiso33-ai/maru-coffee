@@ -2,7 +2,8 @@
 
 /* MARU 디자인 토큰 — 따뜻한 종이색 바탕, 에스프레소 잉크, 고려대 크림슨 한 가지 포인트 */
 @theme {
-  --font-sans: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Malgun Gothic', system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  /* 한글 본문: 고운돋움(굵기 1종) — 없는 글자·굵기 보완은 Pretendard */
+  --font-sans: 'Gowun Dodum', 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, 'Malgun Gothic', system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
   --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
 
   --color-paper: #faf8f3;
