@@ -45,11 +45,10 @@ export default function Activities() {
   return (
     <>
       <PageHeader
-        eyebrow="Activities"
         title="활동"
         action={isAdmin && <Button to="/activities/new"><Plus size={18} /> 활동 만들기</Button>}
       >
-        모임 날짜와 그날 함께 마신 원두. 활동을 열면 부원들이 남긴 노트를 원두별로 비교해 볼 수 있어요.
+        모임 일정과 그날 마신 원두를 모아 봐요.
       </PageHeader>
 
       {!isConfigured && <Notice>Supabase가 연결되면 운영진이 등록한 활동이 여기에 보여요.</Notice>}

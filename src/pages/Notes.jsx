@@ -61,72 +61,73 @@ export default function Notes() {
   return (
     <>
       <PageHeader
-        eyebrow="Tasting Notes"
         title="테이스팅 노트"
         action={<Button to="/notes/new"><Plus size={18} /> 노트 쓰기</Button>}
       >
-        부원들이 마신 커피를 원두, 산지, 향미로 찾아보세요.
+        부원들이 마신 커피 기록이에요.
       </PageHeader>
 
-      {notes && (
-        <WorldMap
-          counts={originCounts}
-          selectedId={originSel?.id}
-          onSelect={(o) => update('origin', o.name === origin ? '' : o.name)}
-          caption={originCounts.size ? `${originCounts.size}개 나라의 커피를 마셨어요 · 나라를 누르면 그 산지 노트만 보여요` : '산지를 적은 노트가 쌓이면 지도에 표시돼요'}
-          className="mb-5"
-        />
-      )}
-
-      <div className="filter-panel mb-6 space-y-3">
-        <div className="relative">
-          <Search size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
-          <input
-            type="search"
-            value={q}
-            onChange={(e) => update('q', e.target.value)}
-            placeholder="원두, 로스터리, 향미, 작성자 검색"
-            aria-label="노트 검색"
-            className="field pl-10"
+      {/* 산지 지도와 검색·필터를 데스크톱에서는 나란히 — 지도가 화면을 다 차지하지 않게 */}
+      <div className="mb-6 grid grid-cols-[minmax(0,1fr)] items-start gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+        {notes && (
+          <WorldMap
+            counts={originCounts}
+            selectedId={originSel?.id}
+            onSelect={(o) => update('origin', o.name === origin ? '' : o.name)}
+            caption={originCounts.size ? `${originCounts.size}개 나라 · 나라를 누르면 그 산지 노트만 보여요` : '산지를 적은 노트가 쌓이면 지도에 표시돼요'}
           />
-        </div>
-        <div className="note-filters flex flex-wrap items-center gap-2">
-          <FilterSelect label="추출 방식" value={method} onChange={(v) => update('method', v)} options={BREW_METHODS} />
-          <FilterSelect label="가공 방식" value={process} onChange={(v) => update('process', v)} options={PROCESSES} />
-          {origin && (
-            <button type="button" onClick={() => update('origin', '')} aria-label={`${origin} 산지 필터 해제`}
-              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-accent-soft px-3 text-sm font-semibold text-accent-strong">
-              {origin} <X size={14} />
-            </button>
-          )}
-          {flavor && (
-            <button type="button" onClick={() => update('flavor', '')} aria-label={`${flavor} 향미 필터 해제`}
-              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-accent-soft px-3 text-sm font-semibold text-accent-strong">
-              {flavor} <X size={14} />
-            </button>
-          )}
-          {user && (
-            <button
-              type="button"
-              aria-pressed={mine}
-              onClick={() => update('mine', mine ? '' : '1')}
-              className={cx('h-11 rounded-full border px-4 text-sm font-semibold sm:h-10', mine ? 'border-ink bg-ink text-paper' : 'border-line bg-surface text-ink-soft hover:border-line-strong')}
-            >
-              내 노트
-            </button>
-          )}
-          {hasFilter && (
-            <button type="button" onClick={() => setParams({}, { replace: true })} className="inline-flex h-11 items-center gap-1 px-2 text-sm text-muted hover:text-ink sm:h-10">
-              <X size={15} /> 초기화
-            </button>
-          )}
-          <div className="ml-auto">
-            <Segmented
-              label="정렬"
-              value={sort}
-              onChange={(v) => update('sort', v === 'new' ? '' : v)}
-              options={[{ value: 'new', label: '최신순' }, { value: 'rating', label: '평점순' }]}
+        )}
+
+        <div className="filter-panel space-y-3">
+          <div className="relative">
+            <Search size={18} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+            <input
+              type="search"
+              value={q}
+              onChange={(e) => update('q', e.target.value)}
+              placeholder="원두, 로스터리, 향미, 작성자 검색"
+              aria-label="노트 검색"
+              className="field pl-10"
             />
+          </div>
+          <div className="note-filters flex flex-wrap items-center gap-2">
+            <FilterSelect label="추출 방식" value={method} onChange={(v) => update('method', v)} options={BREW_METHODS} />
+            <FilterSelect label="가공 방식" value={process} onChange={(v) => update('process', v)} options={PROCESSES} />
+            {origin && (
+              <button type="button" onClick={() => update('origin', '')} aria-label={`${origin} 산지 필터 해제`}
+                className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-accent-soft px-3 text-sm font-semibold text-accent-strong">
+                {origin} <X size={14} />
+              </button>
+            )}
+            {flavor && (
+              <button type="button" onClick={() => update('flavor', '')} aria-label={`${flavor} 향미 필터 해제`}
+                className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-accent-soft px-3 text-sm font-semibold text-accent-strong">
+                {flavor} <X size={14} />
+              </button>
+            )}
+            {user && (
+              <button
+                type="button"
+                aria-pressed={mine}
+                onClick={() => update('mine', mine ? '' : '1')}
+                className={cx('h-11 rounded-full border px-4 text-sm font-semibold sm:h-10', mine ? 'border-ink bg-ink text-paper' : 'border-line bg-surface text-ink-soft hover:border-line-strong')}
+              >
+                내 노트
+              </button>
+            )}
+            {hasFilter && (
+              <button type="button" onClick={() => setParams({}, { replace: true })} className="inline-flex h-11 items-center gap-1 px-2 text-sm text-muted hover:text-ink sm:h-10">
+                <X size={15} /> 초기화
+              </button>
+            )}
+            <div className="ml-auto">
+              <Segmented
+                label="정렬"
+                value={sort}
+                onChange={(v) => update('sort', v === 'new' ? '' : v)}
+                options={[{ value: 'new', label: '최신순' }, { value: 'rating', label: '평점순' }]}
+              />
+            </div>
           </div>
         </div>
       </div>

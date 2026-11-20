@@ -13,11 +13,10 @@ export default function Recipes() {
   return (
     <>
       <PageHeader
-        eyebrow="Recipes"
         title="브루잉 레시피"
         action={<Button to="/recipes/new"><Plus size={18} /> 레시피 공유</Button>}
       >
-        MARU 표준 레시피는 정기 모임과 신입 교육의 기준점이에요. 레시피를 열면 원두 양에 맞춰 바로 타이머를 돌릴 수 있어요.
+        MARU 표준 레시피와 부원들의 레시피예요.
       </PageHeader>
 
       <div className="mb-6">

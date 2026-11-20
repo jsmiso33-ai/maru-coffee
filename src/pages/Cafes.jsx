@@ -56,17 +56,16 @@ export default function Cafes() {
   return (
     <>
       <PageHeader
-        eyebrow="Cafés"
         title="카페 지도"
         action={<Button to="/cafes/new"><Plus size={18} /> 카페 추가</Button>}
       >
-        부원들이 직접 다녀온 전국의 커피 맛집. 핀을 누르면 한 줄 평과 추천 메뉴를 볼 수 있어요.
+        부원들이 다녀온 전국의 커피 맛집이에요.
       </PageHeader>
 
       {!isConfigured && <Notice>Supabase가 연결되면 부원들이 기록한 카페가 지도에 모여요.</Notice>}
 
       {/* 지역 */}
-      <div className="mb-3 overflow-x-auto [scrollbar-width:none]" role="group" aria-label="지역">
+      <div className="mb-5 overflow-x-auto [scrollbar-width:none]" role="group" aria-label="지역">
         <div className="flex w-max gap-1.5">
           <RegionChip label="전국" count={all.length} active={!region} onClick={() => update('region', '')} />
           {CAFE_REGIONS.map((r) => (
@@ -74,31 +73,6 @@ export default function Cafes() {
           ))}
         </div>
       </div>
-      <div className="mb-5 flex flex-wrap items-center gap-2">
-        <select
-          aria-label="분위기·특징"
-          value={tag}
-          onChange={(e) => update('tag', e.target.value)}
-          className={cx('field h-11 w-auto py-0 pr-8 text-sm font-semibold sm:h-10', tag && 'border-ink')}
-        >
-          <option value="">특징 전체</option>
-          {CAFE_TAGS.map((t) => <option key={t} value={t}>{t}</option>)}
-        </select>
-        {(region || tag) && (
-          <button type="button" onClick={() => { setParams({}, { replace: true }); setSelected(null); }} className="inline-flex h-11 items-center gap-1 px-2 text-sm text-muted hover:text-ink sm:h-10">
-            <X size={15} /> 초기화
-          </button>
-        )}
-        <div className="ml-auto">
-          <Segmented
-            label="정렬"
-            value={sort}
-            onChange={(v) => update('sort', v === 'new' ? '' : v)}
-            options={[{ value: 'new', label: '최신순' }, { value: 'rating', label: '별점순' }]}
-          />
-        </div>
-      </div>
-
       {error && (
         <div className="mb-4"><Notice tone="accent" action={<Button size="sm" variant="outline" onClick={reload}>다시 시도</Button>}>{error}</Notice></div>
       )}
@@ -128,11 +102,34 @@ export default function Cafes() {
         </div>
 
         <section aria-label="카페 목록">
+          {/* 특징·정렬은 목록 바로 위에 — 지역 칩과 겹쳐 두 줄로 쌓이지 않게 */}
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            {!loading && <span className="mr-auto text-sm text-muted tnum">{cafes.length}곳</span>}
+            <select
+              aria-label="분위기·특징"
+              value={tag}
+              onChange={(e) => update('tag', e.target.value)}
+              className={cx('field h-11 w-auto py-0 pr-8 text-sm font-semibold sm:h-10', tag && 'border-ink')}
+            >
+              <option value="">특징 전체</option>
+              {CAFE_TAGS.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+            <Segmented
+              label="정렬"
+              value={sort}
+              onChange={(v) => update('sort', v === 'new' ? '' : v)}
+              options={[{ value: 'new', label: '최신순' }, { value: 'rating', label: '별점순' }]}
+            />
+            {(region || tag) && (
+              <button type="button" onClick={() => { setParams({}, { replace: true }); setSelected(null); }} className="inline-flex h-11 items-center gap-1 px-1 text-sm text-muted hover:text-ink sm:h-10">
+                <X size={15} /> 초기화
+              </button>
+            )}
+          </div>
           {loading ? (
             <Spinner />
           ) : cafes.length ? (
             <>
-              <p className="mb-3 text-sm text-muted tnum">{cafes.length}곳</p>
               <ul className="space-y-2.5">
                 {cafes.map((c) => (
                   <li key={c.id}>

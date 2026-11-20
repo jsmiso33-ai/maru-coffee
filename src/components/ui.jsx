@@ -190,13 +190,13 @@ export function Notice({ tone = 'neutral', icon: Icon, children, action }) {
   );
 }
 
-export function PageHeader({ eyebrow, title, children, action }) {
+// 페이지 제목: 제목 한 줄 + 짧은 설명 한 줄 + 오른쪽 버튼. (영문 소제목·구분선은 번잡해서 뺐다)
+export function PageHeader({ title, children, action }) {
   return (
     <header className="page-heading">
       <div className="min-w-0">
-        {eyebrow && <p className="page-kicker">{eyebrow}</p>}
-        <h1 className="text-[clamp(1.85rem,3.6vw,2.8rem)] font-bold leading-tight tracking-[-0.055em]">{title}</h1>
-        {children && <p className="mt-2 max-w-xl text-[0.95rem] leading-relaxed text-muted">{children}</p>}
+        <h1 className="text-[clamp(1.7rem,3vw,2.3rem)] font-bold leading-tight tracking-[-0.05em]">{title}</h1>
+        {children && <p className="mt-1.5 max-w-xl text-[0.95rem] leading-relaxed text-muted">{children}</p>}
       </div>
       {action}
     </header>

@@ -10,7 +10,7 @@ export default function Privacy() {
 
   return (
     <article className="mx-auto max-w-2xl">
-      <PageHeader eyebrow="Privacy" title="개인정보처리방침">
+      <PageHeader title="개인정보처리방침">
         {CLUB.school} {CLUB.tagline} {CLUB.name}(이하 “동아리”)의 부원용 웹사이트가 어떤 정보를 왜 쓰는지 설명합니다.
       </PageHeader>
 
