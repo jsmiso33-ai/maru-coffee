@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { Link } from 'react-router';
+import { Suspense, lazy, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router';
 import { ArrowRight, ArrowUpRight, BookOpen, Calculator, Clock, MapPin, NotebookPen, Plus, Timer } from 'lucide-react';
 import { CLUB } from '../lib/config.js';
 import { listActivities, listNotes, useAsync } from '../lib/db.js';
@@ -10,6 +10,10 @@ import { Button, Card, FlavorChip, Notice, Spinner } from '../components/ui.jsx'
 import NoteCard from '../components/NoteCard.jsx';
 import { formatClock, formatDay, formatDuration, todayKey } from '../lib/format.js';
 import brewPhoto from '../assets/hand-drip.webp';
+import { COFFEE_ORIGINS, matchOrigin } from '../data/origins.js';
+
+// 지도(d3-geo)는 홈 첫 화면 번들에서 빼고 따로 받는다
+const WorldMap = lazy(() => import('../components/WorldMap.jsx'));
 
 const featured = STANDARD_RECIPES.slice(0, 3);
 
@@ -56,6 +60,8 @@ export default function Home() {
         )}
         {notes?.length > 0 && <JournalStats notes={notes} />}
       </section>
+
+      {notes && <OriginMap notes={notes} />}
 
       <section>
         <SectionHead title="브루잉 레시피와 도구" to="/recipes" link="레시피 전체 보기" />
@@ -112,6 +118,65 @@ function JournalStats({ notes }) {
           ))}</div>
         </div>
       )}
+    </section>
+  );
+}
+
+// 마루가 마신 커피 산지: 지도 + 많이 마신 나라 순위
+function OriginMap({ notes }) {
+  const navigate = useNavigate();
+  const { counts, ranking, unknown } = useMemo(() => {
+    const m = new Map();
+    let unmatched = 0;
+    for (const n of notes) {
+      const o = matchOrigin(n.origin);
+      if (o) m.set(o.id, (m.get(o.id) || 0) + 1);
+      else unmatched++;
+    }
+    const ranked = COFFEE_ORIGINS.filter((o) => m.has(o.id)).sort((a, b) => m.get(b.id) - m.get(a.id));
+    return { counts: m, ranking: ranked, unknown: unmatched };
+  }, [notes]);
+  const top = ranking.slice(0, 5);
+  const max = top.length ? counts.get(top[0].id) : 1;
+  const open = (o) => navigate(`/notes?origin=${encodeURIComponent(o.name)}`);
+
+  return (
+    <section aria-labelledby="origin-map-title">
+      <div className="section-head">
+        <h2 id="origin-map-title">마루가 마신 커피 지도</h2>
+        <Link to="/notes">산지별 노트 보기 <ArrowRight size={15} /></Link>
+      </div>
+      <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr] lg:items-center">
+        <Suspense fallback={<div className="aspect-[12/5] animate-pulse rounded-[var(--radius-card)] bg-sunken/60" />}>
+          <WorldMap counts={counts} onSelect={open} caption="나라를 누르면 그 산지 노트를 볼 수 있어요" />
+        </Suspense>
+        {top.length ? (
+          <div>
+            <p className="mb-3 text-sm text-muted tnum">
+              <strong className="font-display text-3xl font-normal text-ink">{ranking.length}</strong>개 나라 ·{' '}
+              노트 {notes.length - unknown}개
+            </p>
+            <ol className="space-y-1">
+              {top.map((o, i) => (
+                <li key={o.id}>
+                  <button type="button" onClick={() => open(o)} className="group grid min-h-11 w-full grid-cols-[1.5rem_5.5rem_1fr_2rem] items-center gap-2 rounded-lg px-1 text-left text-sm hover:bg-sunken">
+                    <span className="font-display text-muted tnum">{i + 1}</span>
+                    <span className="truncate font-semibold group-hover:text-accent">{o.name}</span>
+                    <span className="h-2 overflow-hidden rounded-full bg-sunken" aria-hidden>
+                      <span className="block h-full rounded-full bg-accent" style={{ width: `${(counts.get(o.id) / max) * 100}%` }} />
+                    </span>
+                    <span className="text-right text-muted tnum">{counts.get(o.id)}</span>
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ) : (
+          <p className="text-sm leading-relaxed text-muted">
+            노트에 산지를 적으면 이 지도가 하나씩 채워져요. 에티오피아부터 파나마까지, 마루의 커피 여행을 기록해 보세요.
+          </p>
+        )}
+      </div>
     </section>
   );
 }
