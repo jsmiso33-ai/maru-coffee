@@ -14,9 +14,19 @@ const NAV = [
   { to: '/notes', label: '테이스팅 노트', short: '노트', icon: NotebookPen },
   { to: '/cafes', label: '카페 지도', short: '카페', icon: Coffee },
   { to: '/recipes', label: '레시피', icon: BookOpen },
-  { to: '/brew', label: '계산기·타이머', short: '브루잉', icon: Timer },
+  { to: '/brew', label: '계산기·타이머', short: '브루잉', icon: Timer, disabled: true },
   { to: '/gallery', label: '갤러리', icon: Images },
 ];
+
+function MenuLink({ item, mobile = false }) {
+  const { to, label, short, icon: Icon, end, disabled } = item;
+  const style = mobile ? 'mobile-nav-link' : 'desktop-nav-link';
+  const content = mobile ? <><Icon aria-hidden size={22} strokeWidth={1.8} />{short || label}</> : label;
+  if (disabled) {
+    return <span role="link" aria-disabled="true" className={style}>{content}</span>;
+  }
+  return <NavLink to={to} end={end} className={({ isActive }) => cx(style, isActive && 'is-current')}>{content}</NavLink>;
+}
 
 function NavIndicator() {
   const ref = useRef(null);
@@ -168,19 +178,7 @@ export default function Layout() {
           <Wordmark />
           <nav aria-label="주요 메뉴" className="relative hidden h-full items-stretch gap-2 md:flex lg:gap-5">
             <NavIndicator />
-            {NAV.map(({ to, label, end }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={end}
-                className={({ isActive }) => cx(
-                  'desktop-nav-link',
-                  isActive && 'is-current',
-                )}
-              >
-                {label}
-              </NavLink>
-            ))}
+            {NAV.map((item) => <MenuLink key={item.to} item={item} />)}
           </nav>
           <AuthArea />
         </div>
@@ -213,20 +211,8 @@ export default function Layout() {
       <nav aria-label="주요 메뉴" className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
         <NavIndicator />
         <ul className="grid grid-flow-col auto-cols-fr">
-          {NAV.map(({ to, label, short, icon: Icon, end }) => (
-            <li key={to}>
-              <NavLink
-                to={to}
-                end={end}
-                className={({ isActive }) => cx(
-                  'mobile-nav-link',
-                  isActive && 'is-current',
-                )}
-              >
-                <Icon size={22} strokeWidth={1.8} />
-                {short || label}
-              </NavLink>
-            </li>
+          {NAV.map((item) => (
+            <li key={item.to}><MenuLink item={item} mobile /></li>
           ))}
         </ul>
       </nav>

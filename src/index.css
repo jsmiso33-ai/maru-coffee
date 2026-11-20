@@ -110,7 +110,8 @@ input[type='number'] {
   position: relative; display: grid; place-items: center; padding-inline: .55rem;
   color: var(--color-muted); font-size: .94rem; font-weight: 600;
 }
-.desktop-nav-link:hover, .desktop-nav-link.is-current { color: var(--color-accent); }
+a.desktop-nav-link:hover, .desktop-nav-link.is-current { color: var(--color-accent); }
+.desktop-nav-link[aria-disabled], .mobile-nav-link[aria-disabled] { opacity: .55; cursor: not-allowed; }
 .nav-indicator {
   position: absolute; left: 0; bottom: 0; height: 3px; pointer-events: none;
   transition: transform 260ms cubic-bezier(.22, 1, .36, 1), width 260ms cubic-bezier(.22, 1, .36, 1);
