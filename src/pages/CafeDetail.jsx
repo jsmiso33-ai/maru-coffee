@@ -3,9 +3,10 @@ import { Link, useNavigate, useParams } from 'react-router';
 import { ArrowLeft, CalendarDays, Copy, ExternalLink, Pencil, Trash2, UtensilsCrossed } from 'lucide-react';
 import { deleteCafe, getCafe, useAsync } from '../lib/db.js';
 import { useAuth } from '../lib/auth.jsx';
-import { kakaoMapUrl, naverMapUrl } from '../data/cafes.js';
+import { kakaoMapUrl } from '../data/cafes.js';
 import { Avatar, Button, Card, Notice, Spinner, Stars } from '../components/ui.jsx';
 import { NotFound } from './NotFound.jsx';
+import NaverMapButton from '../components/NaverMapButton.jsx';
 import { formatDate } from '../lib/format.js';
 
 const CafeMap = lazy(() => import('../components/CafeMap.jsx'));
@@ -52,7 +53,7 @@ export default function CafeDetail() {
         <ArrowLeft size={16} /> 카페 지도
       </Link>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         <div>
           <span className="rounded-full bg-sunken px-2.5 py-0.5 text-xs font-semibold text-ink-soft">{cafe.region}</span>
           <h1 className="mt-3 text-3xl font-bold leading-tight tracking-tight sm:text-4xl">{cafe.name}</h1>
@@ -75,8 +76,8 @@ export default function CafeDetail() {
           )}
 
           <div className="mt-3 flex flex-wrap gap-2">
+            <NaverMapButton cafe={cafe} />
             <Button variant="outline" size="sm" href={kakaoMapUrl(cafe)}><ExternalLink size={15} /> 카카오맵</Button>
-            <Button variant="outline" size="sm" href={naverMapUrl(cafe)}><ExternalLink size={15} /> 네이버 지도</Button>
             {cafe.link && <Button variant="ghost" size="sm" href={cafe.link}><ExternalLink size={15} /> 링크</Button>}
           </div>
 

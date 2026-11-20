@@ -4,6 +4,7 @@ import { LocateFixed, MapPin, Plus, Star, X } from 'lucide-react';
 import { listCafes, useAsync } from '../lib/db.js';
 import { isConfigured } from '../lib/supabase.js';
 import { CAFE_REGIONS, CAFE_TAGS } from '../data/cafes.js';
+import NaverMapButton from '../components/NaverMapButton.jsx';
 import { Avatar, Button, Card, Notice, PageHeader, Segmented, Spinner, cx } from '../components/ui.jsx';
 
 // Leaflet(지도 라이브러리)은 이 탭에서만 받는다
@@ -65,7 +66,7 @@ export default function Cafes() {
       {!isConfigured && <Notice>Supabase가 연결되면 부원들이 기록한 카페가 지도에 모여요.</Notice>}
 
       {/* 지역 */}
-      <div className="-mx-4 mb-3 overflow-x-auto px-4 sm:mx-0 sm:px-0" role="group" aria-label="지역">
+      <div className="mb-3 overflow-x-auto [scrollbar-width:none]" role="group" aria-label="지역">
         <div className="flex w-max gap-1.5">
           <RegionChip label="전국" count={all.length} active={!region} onClick={() => update('region', '')} />
           {CAFE_REGIONS.map((r) => (
@@ -102,7 +103,7 @@ export default function Cafes() {
         <div className="mb-4"><Notice tone="accent" action={<Button size="sm" variant="outline" onClick={reload}>다시 시도</Button>}>{error}</Notice></div>
       )}
 
-      <div className="grid items-start gap-5 lg:grid-cols-[1.55fr_1fr]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
         <div className="relative lg:sticky lg:top-24">
           <Suspense fallback={<div className="h-[52vh] min-h-80 animate-pulse rounded-[var(--radius-card)] bg-sunken lg:h-[calc(100vh-8rem)]" />}>
             <CafeMap
@@ -219,7 +220,10 @@ function SelectedCafe({ cafe, onClose }) {
         </div>
         <button type="button" onClick={onClose} aria-label="닫기" className="-mr-1.5 -mt-1.5 grid size-11 shrink-0 place-items-center rounded-full text-muted hover:bg-sunken"><X size={17} /></button>
       </div>
-      <Button to={`/cafes/${cafe.id}`} size="sm" className="mt-3 w-full">자세히 보기</Button>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <NaverMapButton cafe={cafe} />
+        <Button to={`/cafes/${cafe.id}`} size="sm" variant="outline">마루 후기 보기</Button>
+      </div>
     </div>
   );
 }
