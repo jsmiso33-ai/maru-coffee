@@ -7,6 +7,8 @@ import { ATTRIBUTES } from '../data/options.js';
 import { Avatar, Button, Card, FlavorChip, Notice, Spinner, Stars } from '../components/ui.jsx';
 import { NotFound } from './NotFound.jsx';
 import Comments from '../components/Comments.jsx';
+import WorldMap from '../components/WorldMap.jsx';
+import { matchOrigin } from '../data/origins.js';
 import RadarChart from '../components/RadarChart.jsx';
 import { formatDate, formatDay } from '../lib/format.js';
 
@@ -42,6 +44,7 @@ export default function NoteDetail() {
     }
   };
 
+  const origin = matchOrigin(note.origin);
   const facts = [
     ['산지', note.origin],
     ['가공', note.process],
@@ -101,6 +104,14 @@ export default function NoteDetail() {
         </Card>
 
         <div className="space-y-5">
+          {origin && (
+            <Card className="p-4">
+              <h2 className="mb-2.5 flex items-baseline justify-between gap-2 text-sm font-semibold text-muted">
+                산지 <span className="text-ink">{note.origin}</span>
+              </h2>
+              <WorldMap selectedId={origin.id} caption={`${origin.region} · ${origin.name}`} />
+            </Card>
+          )}
           {note.flavors?.length > 0 && (
             <Card className="p-5">
               <h2 className="text-sm font-semibold text-muted">느낀 향미</h2>

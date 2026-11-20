@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
-import { ArrowLeft, CalendarDays, Plus } from 'lucide-react';
+import { ArrowLeft, CalendarDays, MapPin, Plus } from 'lucide-react';
 import { getNote, listActivities, saveNote } from '../lib/db.js';
 import { daysUntil, formatDay } from '../lib/format.js';
 import { useAuth } from '../lib/auth.jsx';
@@ -10,6 +10,8 @@ import { FLAVOR_GROUPS } from '../data/flavors.js';
 import { Button, Card, FlavorChip, Label, Notice, ScaleInput, Spinner, StarInput, cx } from '../components/ui.jsx';
 import MemberGate from '../components/MemberGate.jsx';
 import RadarChart from '../components/RadarChart.jsx';
+import WorldMap from '../components/WorldMap.jsx';
+import { matchOrigin } from '../data/origins.js';
 import { NotFound } from './NotFound.jsx';
 
 const MAX_FLAVORS = 12;
@@ -105,6 +107,9 @@ function NoteFormInner({ preview = false }) {
   };
   const chooseBean = (bean) => setForm((f) => applyActivity(f, linked, bean));
 
+  const originMatch = matchOrigin(form.origin);
+  const guessedOrigin = matchOrigin(form.bean_name);
+
   const allPreset = new Set(FLAVOR_GROUPS.flatMap((g) => g.items));
   const customSelected = form.flavors.filter((f) => !allPreset.has(f));
   const beanMissing = !form.bean_name.trim();
@@ -193,16 +198,28 @@ function NoteFormInner({ preview = false }) {
             <input {...bind('bean_name')} maxLength={80} className="field" placeholder="예: 에티오피아 예가체프 코체레" aria-invalid={touched && beanMissing} />
             {touched && beanMissing && <p className="mt-1.5 text-sm text-accent">원두 이름을 적어 주세요.</p>}
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <Label htmlFor="roaster">로스터리 · 카페</Label>
-              <input {...bind('roaster')} maxLength={60} className="field" placeholder="어디서 샀거나 마셨나요" />
-            </div>
-            <div>
-              <Label htmlFor="origin">산지</Label>
-              <input {...bind('origin')} maxLength={60} className="field" list="origin-list" placeholder="에티오피아" />
-              <datalist id="origin-list">{ORIGINS.map((o) => <option key={o} value={o} />)}</datalist>
-            </div>
+          <div>
+            <Label htmlFor="roaster">로스터리 · 카페</Label>
+            <input {...bind('roaster')} maxLength={60} className="field" placeholder="어디서 샀거나 마셨나요" />
+          </div>
+          <div>
+            <Label htmlFor="origin" hint="지도에서 나라를 누르거나 직접 입력">산지</Label>
+            <WorldMap
+              selectedId={originMatch?.id}
+              onSelect={(o) => setForm((f) => ({ ...f, origin: keepRegion(f.origin, o.name) }))}
+              className="mb-2.5"
+            />
+            <input {...bind('origin')} maxLength={60} className="field" list="origin-list" placeholder="예: 에티오피아 구지 · 블렌드" />
+            <datalist id="origin-list">{ORIGINS.map((o) => <option key={o} value={o} />)}</datalist>
+            {!form.origin.trim() && guessedOrigin && (
+              <button
+                type="button"
+                onClick={() => setForm((f) => ({ ...f, origin: guessedOrigin.name }))}
+                className="mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-soft px-3.5 text-sm font-semibold text-accent-strong sm:min-h-9"
+              >
+                <MapPin size={14} /> 원두 이름에 있는 ‘{guessedOrigin.name}’로 넣기
+              </button>
+            )}
           </div>
           <OptionRow label="가공 방식" options={PROCESSES} value={form.process} onChange={set('process')} />
           <OptionRow label="로스팅" options={ROAST_LEVELS} value={form.roast_level} onChange={set('roast_level')} />
@@ -294,6 +311,12 @@ function NoteFormInner({ preview = false }) {
       </div>
     </form>
   );
+}
+
+// 지도에서 다른 나라를 누르면 산지를 바꾸되, 같은 나라면 "에티오피아 구지"처럼 적어 둔 세부 지역은 남긴다
+function keepRegion(current, country) {
+  const prev = matchOrigin(current);
+  return prev && prev.name === country && current.trim() ? current : country;
 }
 
 // 활동(과 원두)을 고르면 마신 날과 원두 정보를 채운다. 사용자가 이미 적은 값은 원두를 고를 때만 덮어쓴다.

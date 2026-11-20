@@ -1,10 +1,10 @@
+import { COFFEE_ORIGINS } from './origins.js';
+
 export const PROCESSES = ['워시드', '내추럴', '허니', '무산소 발효', '기타'];
 export const ROAST_LEVELS = ['라이트', '미디엄 라이트', '미디엄', '미디엄 다크', '다크'];
 export const BREW_METHODS = ['V60', '칼리타', '케멕스', '에어로프레스', '프렌치프레스', '에스프레소', '콜드브루', '카페에서'];
-export const ORIGINS = [
-  '에티오피아', '케냐', '르완다', '부룬디', '탄자니아', '콜롬비아', '과테말라', '코스타리카', '파나마',
-  '엘살바도르', '온두라스', '니카라과', '페루', '볼리비아', '브라질', '인도네시아', '예멘', '블렌드',
-];
+// 산지 입력 자동완성: 지도에 있는 커피 산지 + 블렌드
+export const ORIGINS = [...COFFEE_ORIGINS.map((o) => o.name), '블렌드'];
 
 export const ATTRIBUTES = [
   { key: 'acidity', label: '산미', low: '부드러움', high: '선명함' },

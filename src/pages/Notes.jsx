@@ -6,6 +6,8 @@ import { useAuth } from '../lib/auth.jsx';
 import { BREW_METHODS, PROCESSES } from '../data/options.js';
 import { Button, Card, Notice, PageHeader, Segmented, Spinner, cx } from '../components/ui.jsx';
 import NoteCard from '../components/NoteCard.jsx';
+import WorldMap from '../components/WorldMap.jsx';
+import { matchOrigin } from '../data/origins.js';
 
 export default function Notes() {
   const { data: notes, loading, error } = useAsync(listNotes, []);
@@ -16,6 +18,7 @@ export default function Notes() {
   const method = params.get('method') ?? '';
   const process = params.get('process') ?? '';
   const flavor = params.get('flavor') ?? '';
+  const origin = params.get('origin') ?? '';
   const sort = params.get('sort') ?? 'new';
   const mine = params.get('mine') === '1';
 
@@ -30,6 +33,7 @@ export default function Notes() {
     const needle = q.trim().toLowerCase();
     const list = notes.filter((n) => {
       if (flavor && !n.flavors?.includes(flavor)) return false;
+      if (origin && matchOrigin(n.origin)?.name !== origin) return false;
       if (method && n.brew_method !== method) return false;
       if (process && n.process !== process) return false;
       if (mine && n.user_id !== user?.id) return false;
@@ -39,9 +43,20 @@ export default function Notes() {
     });
     if (sort === 'rating') list.sort((a, b) => b.rating - a.rating || b.created_at.localeCompare(a.created_at));
     return list;
-  }, [notes, q, method, process, flavor, sort, mine, user?.id]);
+  }, [notes, q, method, process, flavor, origin, sort, mine, user?.id]);
 
-  const hasFilter = q || method || process || flavor || mine;
+  // 산지별 노트 수 (지도 진하기)
+  const originCounts = useMemo(() => {
+    const m = new Map();
+    notes?.forEach((n) => {
+      const o = matchOrigin(n.origin);
+      if (o) m.set(o.id, (m.get(o.id) || 0) + 1);
+    });
+    return m;
+  }, [notes]);
+  const originSel = origin ? matchOrigin(origin) : null;
+
+  const hasFilter = q || method || process || flavor || origin || mine;
 
   return (
     <>
@@ -52,6 +67,16 @@ export default function Notes() {
       >
         부원들이 마신 커피를 원두, 산지, 향미로 찾아보세요.
       </PageHeader>
+
+      {notes?.length > 0 && (
+        <WorldMap
+          counts={originCounts}
+          selectedId={originSel?.id}
+          onSelect={(o) => update('origin', o.name === origin ? '' : o.name)}
+          caption={originCounts.size ? `${originCounts.size}개 나라의 커피를 마셨어요 · 나라를 누르면 그 산지 노트만 보여요` : '산지를 적은 노트가 쌓이면 지도에 표시돼요'}
+          className="mb-5"
+        />
+      )}
 
       <div className="filter-panel mb-6 space-y-3">
         <div className="relative">
@@ -68,6 +93,12 @@ export default function Notes() {
         <div className="note-filters flex flex-wrap items-center gap-2">
           <FilterSelect label="추출 방식" value={method} onChange={(v) => update('method', v)} options={BREW_METHODS} />
           <FilterSelect label="가공 방식" value={process} onChange={(v) => update('process', v)} options={PROCESSES} />
+          {origin && (
+            <button type="button" onClick={() => update('origin', '')} aria-label={`${origin} 산지 필터 해제`}
+              className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-accent-soft px-3 text-sm font-semibold text-accent-strong">
+              {origin} <X size={14} />
+            </button>
+          )}
           {flavor && (
             <button type="button" onClick={() => update('flavor', '')} aria-label={`${flavor} 향미 필터 해제`}
               className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-accent-soft px-3 text-sm font-semibold text-accent-strong">
