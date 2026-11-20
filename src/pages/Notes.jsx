@@ -68,7 +68,7 @@ export default function Notes() {
         부원들이 마신 커피를 원두, 산지, 향미로 찾아보세요.
       </PageHeader>
 
-      {notes?.length > 0 && (
+      {notes && (
         <WorldMap
           counts={originCounts}
           selectedId={originSel?.id}
