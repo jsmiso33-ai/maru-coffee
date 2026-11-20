@@ -70,8 +70,9 @@ export default function Cafes() {
       {!isConfigured && <Notice>Supabase가 연결되면 부원들이 기록한 카페가 지도에 모여요.</Notice>}
 
       {/* 지역 */}
-      <div className="-mx-[1.125rem] mb-5 overflow-x-auto px-[1.125rem] [scrollbar-width:none] md:mx-0 md:px-0" role="group" aria-label="지역">
-        <div className="flex w-max gap-1.5">
+      {/* 지역 9칸: 모바일은 3×3 바둑판(옆으로 넘기지 않고 한눈에), PC는 한 줄 */}
+      <div className="mb-5" role="group" aria-label="지역">
+        <div className="grid grid-cols-3 gap-1.5 md:flex md:flex-wrap">
           <RegionChip label="전국" count={all.length} active={!region} onClick={() => update('region', '')} />
           {CAFE_REGIONS.map((r) => (
             <RegionChip key={r} label={r} count={regionCounts.get(r) || 0} active={region === r} onClick={() => update('region', region === r ? '' : r)} />
@@ -171,7 +172,7 @@ function RegionChip({ label, count, active, onClick }) {
       aria-pressed={active}
       onClick={onClick}
       className={cx(
-        'inline-flex h-11 items-center gap-1.5 rounded-full border px-3.5 text-sm transition-colors sm:h-9',
+        'inline-flex h-10 min-w-0 items-center justify-center gap-1 rounded-full border px-2 text-sm whitespace-nowrap transition-colors md:h-9 md:px-3.5',
         active ? 'border-ink bg-ink font-semibold text-paper' : 'border-line bg-surface text-ink-soft hover:border-line-strong',
       )}
     >
