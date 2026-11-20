@@ -144,7 +144,8 @@ export default function NaverMap({ cafes = [], selectedId, onSelect, pick, onPic
 
   return (
     <div className={cx('cafe-map relative z-0 overflow-hidden rounded-[var(--radius-card)] border border-line', className)}>
-      <div ref={box} className="absolute inset-0" />
+      {/* 네이버 지도가 컨테이너에 position:relative를 넣으므로 inset 대신 크기로 채운다 */}
+      <div ref={box} className="h-full w-full" />
       {failed && (
         <p className="absolute inset-0 grid place-items-center bg-sunken p-6 text-center text-sm text-muted">
           네이버 지도를 불러오지 못했어요. 지도 키와 등록된 웹 서비스 주소를 확인해 주세요.
