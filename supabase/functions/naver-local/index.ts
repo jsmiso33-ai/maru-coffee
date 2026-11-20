@@ -45,7 +45,9 @@ Deno.serve(async (req) => {
     },
   });
   if (!res.ok) {
-    return new Response(JSON.stringify({ error: `naver ${res.status}` }), { status: 502, headers });
+    // 네이버 오류 코드만 넘긴다(키 미구독 210, 인증 실패 등 원인 파악용)
+    const detail = (await res.text()).slice(0, 200);
+    return new Response(JSON.stringify({ error: `naver ${res.status}`, detail }), { status: 502, headers });
   }
   const data = await res.json();
   // mapx·mapy: WGS84 경도·위도. 기존 API는 ×10^7 정수였으므로 큰 값이면 나눈다
