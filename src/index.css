@@ -201,7 +201,11 @@ a.desktop-nav-link:hover, .desktop-nav-link.is-current { color: var(--color-acce
 @media (max-width: 47.99rem) {
   .site-width { width: min(calc(100% - 2.25rem), 38rem); }
   .journal-cover { grid-template-columns: 1fr; gap: 1.35rem; }
-  .cover-copy { padding-block: 0; }
+  /* 모바일 표지 글은 가운데 정렬 — 고려대 줄도 양쪽 선으로 */
+  .cover-copy { padding-block: 0; align-items: center; text-align: center; }
+  .club-byline::after { content: ''; width: 1.7rem; height: 1px; background: currentColor; }
+  .cover-intro { text-wrap: balance; }
+  .cover-actions { justify-content: center; }
   .cover-title { font-size: clamp(3.45rem, 10vw, 4.65rem); line-height: 1; margin-block: .7rem; }
   .cover-title em { display: inline; margin-inline-start: .045em; }
   .cover-actions { margin-top: 1rem; }
