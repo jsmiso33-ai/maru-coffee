@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router';
-import { House, CalendarDays, NotebookPen, BookOpen, Timer, LogOut, Users, Eye, WifiOff, Download, Coffee } from 'lucide-react';
+import { House, CalendarDays, NotebookPen, BookOpen, Timer, LogOut, Users, Eye, WifiOff, Download, Coffee, Images } from 'lucide-react';
 import { useInstall, useOnline } from '../lib/pwa.js';
 import InstallPrompt, { IosSteps } from './InstallPrompt.jsx';
 import { useAuth } from '../lib/auth.jsx';
@@ -15,6 +15,7 @@ const NAV = [
   { to: '/cafes', label: '카페 지도', short: '카페', icon: Coffee },
   { to: '/recipes', label: '레시피', icon: BookOpen },
   { to: '/brew', label: '계산기·타이머', short: '브루잉', icon: Timer },
+  { to: '/gallery', label: '갤러리', icon: Images },
 ];
 
 function NavIndicator() {
@@ -211,7 +212,7 @@ export default function Layout() {
       {/* 모바일 하단 탭 — 브루잉 중 한 손으로 이동 */}
       <nav aria-label="주요 메뉴" className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
         <NavIndicator />
-        <ul className="grid grid-cols-6">
+        <ul className="grid grid-flow-col auto-cols-fr">
           {NAV.map(({ to, label, short, icon: Icon, end }) => (
             <li key={to}>
               <NavLink

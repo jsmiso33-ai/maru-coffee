@@ -27,6 +27,7 @@ export default function Privacy() {
 
         <section>
           <h2>2. 직접 올리는 정보</h2>
+          <p className="mb-2">갤러리에는 운영진이 선정한 사진과 설명을 게시합니다. 모든 방문자가 볼 수 있으며, 사진 삭제는 운영진에게 요청할 수 있습니다.</p>
           <p>부원이 작성한 테이스팅 노트와 레시피는 작성자 이름·사진과 함께 <strong className="font-semibold text-ink">사이트 방문자 누구나 볼 수 있습니다.</strong> 공개되면 곤란한 내용은 적지 말아 주세요.</p>
         </section>
 

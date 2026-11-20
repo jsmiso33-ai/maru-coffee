@@ -33,6 +33,7 @@ const Brew = page(() => import('./pages/Brew.jsx'));
 const Members = page(() => import('./pages/Members.jsx'));
 const Privacy = page(() => import('./pages/Privacy.jsx'));
 const Activities = page(() => import('./pages/Activities.jsx'));
+const Gallery = page(() => import('./pages/Gallery.jsx'));
 const ActivityDetail = page(() => import('./pages/ActivityDetail.jsx'));
 const ActivityForm = page(() => import('./pages/ActivityForm.jsx'));
 const Cafes = page(() => import('./pages/Cafes.jsx'));
@@ -50,6 +51,7 @@ createRoot(document.getElementById('root')).render(
           <Route element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="activities" element={<Activities />} />
+            <Route path="gallery" element={<Gallery />} />
             <Route path="activities/new" element={<ActivityForm />} />
             <Route path="activities/:id" element={<ActivityDetail />} />
             <Route path="activities/:id/edit" element={<ActivityForm />} />
