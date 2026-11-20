@@ -35,8 +35,9 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
 
   if (request.mode === 'navigate' && url.origin === self.location.origin && url.pathname.startsWith(BASE)) {
+    // cache: 'no-cache' — 브라우저 HTTP 캐시(Pages는 10분)에 남은 옛 HTML 대신 항상 서버에 확인해 새 배포를 바로 반영
     event.respondWith(
-      fetch(request)
+      fetch(request, { cache: 'no-cache' })
         .then((res) => (res.ok ? res : caches.match(INDEX).then((cached) => cached || res)))
         .catch(() => caches.match(INDEX)),
     );
