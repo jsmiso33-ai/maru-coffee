@@ -1,6 +1,9 @@
 import { COFFEE_ORIGINS } from './origins.js';
 
 export const PROCESSES = ['워시드', '내추럴', '허니', '무산소 발효', '기타'];
+export function processOption(value) {
+  return value && !PROCESSES.includes(value) ? '기타' : value;
+}
 export const ROAST_LEVELS = ['라이트', '미디엄 라이트', '미디엄', '미디엄 다크', '다크'];
 export const BREW_METHODS = ['V60', '칼리타', '케멕스', '에어로프레스', '프렌치프레스', '에스프레소', '콜드브루', '카페에서'];
 // 산지 입력 자동완성: 지도에 있는 커피 산지 + 블렌드

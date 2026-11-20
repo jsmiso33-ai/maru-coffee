@@ -5,7 +5,7 @@ import { getNote, listActivities, saveNote } from '../lib/db.js';
 import { daysUntil, formatDay } from '../lib/format.js';
 import { useAuth } from '../lib/auth.jsx';
 import { isConfigured } from '../lib/supabase.js';
-import { ATTRIBUTES, BREW_METHODS, ORIGINS, PROCESSES, ROAST_LEVELS } from '../data/options.js';
+import { ATTRIBUTES, BREW_METHODS, ORIGINS, PROCESSES, ROAST_LEVELS, processOption } from '../data/options.js';
 import { FLAVOR_GROUPS } from '../data/flavors.js';
 import { Button, Card, FlavorChip, Label, Notice, ScaleInput, Spinner, StarInput, cx } from '../components/ui.jsx';
 import MemberGate from '../components/MemberGate.jsx';
@@ -22,7 +22,7 @@ function today() {
 }
 
 const EMPTY = {
-  bean_name: '', roaster: '', origin: '', process: '', roast_level: '', brew_method: '',
+  bean_name: '', roaster: '', origin: '', process: '', customProcess: '', roast_level: '', brew_method: '',
   tasted_on: today(), flavors: [], acidity: 3, sweetness: 3, body: 3, bitterness: 3, aftertaste: 3,
   rating: 3.5, memo: '', activity_id: '', activity_bean_id: '',
 };
@@ -74,7 +74,7 @@ function NoteFormInner({ preview = false }) {
     getNote(id)
       .then((n) => {
         if (!n || n.user_id !== user?.id) setNotFound(true);
-        else setForm({ ...EMPTY, ...Object.fromEntries(Object.entries(n).map(([k, v]) => [k, v ?? ''])), rating: Number(n.rating) });
+        else setForm({ ...EMPTY, ...Object.fromEntries(Object.entries(n).map(([k, v]) => [k, v ?? ''])), ...processFields(n.process), rating: Number(n.rating) });
       })
       .catch((e) => setLoadError(e.message));
   }, [id, user?.id]);
@@ -125,7 +125,8 @@ function NoteFormInner({ preview = false }) {
     setSaving(true);
     setError('');
     try {
-      const saved = await saveNote({ ...form, bean_name: form.bean_name.trim() }, id);
+      const process = form.process === '기타' ? form.customProcess.trim() || '기타' : form.process;
+      const saved = await saveNote({ ...form, process, bean_name: form.bean_name.trim() }, id);
       navigate(`/notes/${saved.id}`, { replace: true });
     } catch (err) {
       setError(err.message);
@@ -222,6 +223,10 @@ function NoteFormInner({ preview = false }) {
             )}
           </div>
           <OptionRow label="가공 방식" options={PROCESSES} value={form.process} onChange={set('process')} />
+          {form.process === '기타' && <div>
+            <Label htmlFor="customProcess" hint="선택 · 최대 30자">가공 방식 직접 입력</Label>
+            <input {...bind('customProcess')} maxLength={30} className="field" placeholder="예: 카보닉 매서레이션" />
+          </div>}
           <OptionRow label="로스팅" options={ROAST_LEVELS} value={form.roast_level} onChange={set('roast_level')} />
           <OptionRow label="추출 방식" options={BREW_METHODS} value={form.brew_method} onChange={set('brew_method')} />
           <div className="sm:w-1/2">
@@ -327,10 +332,15 @@ function applyActivity(form, activity, bean) {
     next.bean_name = bean.name;
     next.roaster = bean.roaster ?? '';
     next.origin = bean.origin ?? '';
-    next.process = bean.process ?? '';
+    Object.assign(next, processFields(bean.process));
     next.roast_level = bean.roast_level ?? '';
   }
   return next;
+}
+
+function processFields(value = '') {
+  const choice = processOption(value) || '';
+  return { process: choice, customProcess: choice === '기타' && value !== '기타' ? value : '' };
 }
 
 function SectionTitle({ n, children }) {
