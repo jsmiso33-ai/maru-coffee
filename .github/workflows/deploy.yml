@@ -34,6 +34,7 @@ jobs:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
           BASE_PATH: ${{ vars.BASE_PATH }}
+          VITE_NAVER_MAP_KEY: ${{ vars.VITE_NAVER_MAP_KEY }}
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist

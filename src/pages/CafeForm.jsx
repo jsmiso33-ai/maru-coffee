@@ -86,6 +86,7 @@ function CafeFormInner() {
       region: guessRegion(p.address) || f.region,
       lat: p.lat,
       lng: p.lng,
+      link: f.link || (/^https?:\/\//.test(p.link ?? '') ? p.link : ''),
     }));
     setFocus({ lat: p.lat, lng: p.lng, zoom: 17 });
     setResults(null);
@@ -176,7 +177,10 @@ function CafeFormInner() {
                         <button type="button" onClick={() => choose(p)} className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-sunken">
                           <MapPin size={16} className="mt-0.5 shrink-0 text-accent" />
                           <span className="min-w-0">
-                            <span className="block truncate font-semibold">{p.name}</span>
+                            <span className="block truncate font-semibold">
+                              {p.name}
+                              {p.category && <span className="ml-1.5 text-xs font-normal text-muted">{p.category.split('>').pop()}</span>}
+                            </span>
                             <span className="block truncate text-sm text-muted">{p.address}</span>
                           </span>
                         </button>
@@ -185,7 +189,7 @@ function CafeFormInner() {
                   </ul>
                 ) : (
                   <p className="px-4 py-3 text-sm text-muted">
-                    검색 결과가 없어요. 작은 카페는 이름으로 안 나올 수 있어요 — <strong className="font-semibold text-ink-soft">도로명 주소</strong>로 찾거나 지도를 직접 눌러 주세요.
+                    검색 결과가 없어요. 지역 이름을 붙여 보거나(예: ‘성수 ○○커피’) <strong className="font-semibold text-ink-soft">도로명 주소</strong>로 찾고, 그래도 없으면 지도를 직접 눌러 주세요.
                   </p>
                 )}
               </div>
