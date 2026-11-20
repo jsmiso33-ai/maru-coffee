@@ -45,7 +45,7 @@ export default function Activities() {
   return (
     <>
       <PageHeader
-        title="활동"
+        eyebrow="Activities" title="활동"
         action={isAdmin && <Button to="/activities/new"><Plus size={18} /> 활동 만들기</Button>}
       >
         모임 일정과 그날 마신 원두를 모아 봐요.

@@ -77,7 +77,7 @@ function MembersInner() {
 
   return (
     <>
-      <PageHeader title="운영진 관리">
+      <PageHeader eyebrow="Admin" title="운영진 관리">
         노트·레시피·댓글은 로그인한 누구나 쓸 수 있어요. 여기 있는 운영진은 활동을 만들고, 모든 글과 댓글을 지우고, 운영진을 관리할 수 있어요.
       </PageHeader>
 

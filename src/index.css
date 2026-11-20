@@ -194,6 +194,7 @@ a.desktop-nav-link:hover, .desktop-nav-link.is-current { color: var(--color-acce
 .recipe-row b { margin-top: .15rem; font-size: 1.04rem; }
 .recipe-time { display: flex; align-items: center; justify-content: flex-end; gap: .65rem; font-variant-numeric: tabular-nums; }
 .page-heading { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: .75rem 1rem; padding-top: .25rem; margin-bottom: 1.5rem; }
+.page-kicker { color: var(--color-accent); font: italic 400 clamp(1.05rem, 1.6vw, 1.3rem)/1 var(--font-display); letter-spacing: 0; }
 .filter-panel { padding: 1rem; background: var(--color-sunken); border-radius: var(--radius-card); }
 
 @media (max-width: 47.99rem) {

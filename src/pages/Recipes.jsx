@@ -13,7 +13,7 @@ export default function Recipes() {
   return (
     <>
       <PageHeader
-        title="브루잉 레시피"
+        eyebrow="Recipes" title="브루잉 레시피"
         action={<Button to="/recipes/new"><Plus size={18} /> 레시피 공유</Button>}
       >
         MARU 표준 레시피와 부원들의 레시피예요.

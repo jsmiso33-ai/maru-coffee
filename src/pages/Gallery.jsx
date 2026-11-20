@@ -100,7 +100,7 @@ export default function Gallery() {
   const firstPage = () => { if (page) setPage(0); else reload(); };
   return (
     <>
-      <PageHeader title="갤러리" action={isAdmin && !adding &&
+      <PageHeader eyebrow="Gallery" title="갤러리" action={isAdmin && !adding &&
         <Button onClick={() => { setAdding(true); setMessage(''); }}><Plus size={17} /> 사진 올리기</Button>}>
         마루의 모임과 커피를 사진으로 기록합니다.
       </PageHeader>

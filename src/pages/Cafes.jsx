@@ -56,7 +56,7 @@ export default function Cafes() {
   return (
     <>
       <PageHeader
-        title="카페 지도"
+        eyebrow="Cafés" title="카페 지도"
         action={<Button to="/cafes/new"><Plus size={18} /> 카페 추가</Button>}
       >
         부원들이 다녀온 전국의 커피 맛집이에요.
