@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { ArrowLeft, Plus, X } from 'lucide-react';
 import { getRecipe, saveRecipe } from '../lib/db.js';
 import { useAuth } from '../lib/auth.jsx';
-import { BREW_METHODS } from '../data/options.js';
+import { RECIPE_METHODS } from '../data/options.js';
 import { Button, Card, Label, Notice, Spinner, cx } from '../components/ui.jsx';
 import MemberGate from '../components/MemberGate.jsx';
 import { mmss, parseTime, ratioOf } from '../lib/format.js';
@@ -144,7 +144,7 @@ function RecipeFormInner() {
           <fieldset>
             <legend className="mb-2 text-sm font-semibold">추출 방식</legend>
             <div className="flex flex-wrap gap-1.5">
-              {BREW_METHODS.filter((m) => m !== '카페에서').map((m) => (
+              {RECIPE_METHODS.map((m) => (
                 <button
                   key={m}
                   type="button"

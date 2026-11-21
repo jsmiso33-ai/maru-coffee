@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router';
 import { Plus, Search, X, ChevronDown } from 'lucide-react';
 import { listNotes, useAsync } from '../lib/db.js';
 import { useAuth } from '../lib/auth.jsx';
-import { BREW_METHODS, PROCESSES, processOption } from '../data/options.js';
+import { BREW_METHODS, PROCESSES, methodOption, processOption } from '../data/options.js';
 import { Button, Card, Notice, PageHeader, Spinner, cx, PillSelect } from '../components/ui.jsx';
 import NoteCard from '../components/NoteCard.jsx';
 import WorldMap from '../components/WorldMap.jsx';
@@ -34,7 +34,7 @@ export default function Notes() {
     const list = notes.filter((n) => {
       if (flavor && !n.flavors?.includes(flavor)) return false;
       if (origin && matchOrigin(n.origin)?.name !== origin) return false;
-      if (method && n.brew_method !== method) return false;
+      if (method && n.brew_method !== method && !(method === '기타' && methodOption(n.brew_method) === '기타')) return false;
       if (process && n.process !== process && !(process === '기타' && processOption(n.process) === '기타')) return false;
       if (!needle) return true;
       return [n.bean_name, n.roaster, n.origin, n.process, n.author_name, n.memo, ...(n.flavors || [])]
