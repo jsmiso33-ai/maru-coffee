@@ -260,4 +260,21 @@ export function PillSelect({ label, placeholder = label, value, onChange, option
   );
 }
 
+// 폼 안의 드롭다운: 입력칸(.field)과 같은 모양 + 화살표
+export function FieldSelect({ id, value, onChange, options, placeholder = '선택', ...rest }) {
+  return (
+    <select
+      id={id}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className={cx('field cursor-pointer appearance-none pr-9 bg-[position:right_0.85rem_center] bg-no-repeat', !value && 'text-[#857769]')}
+      style={{ backgroundImage: CHEVRON }}
+      {...rest}
+    >
+      <option value="">{placeholder}</option>
+      {options.map((o) => <option key={o} value={o}>{o}</option>)}
+    </select>
+  );
+}
+
 export { cx };

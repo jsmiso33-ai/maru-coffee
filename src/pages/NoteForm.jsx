@@ -7,7 +7,7 @@ import { useAuth } from '../lib/auth.jsx';
 import { isConfigured } from '../lib/supabase.js';
 import { ATTRIBUTES, BREW_METHODS, ORIGINS, PROCESSES, ROAST_LEVELS, processOption } from '../data/options.js';
 import { FLAVOR_GROUPS } from '../data/flavors.js';
-import { Button, Card, FlavorChip, Label, Notice, ScaleInput, Spinner, StarInput, cx } from '../components/ui.jsx';
+import { Button, Card, FlavorChip, Label, Notice, ScaleInput, Spinner, StarInput, cx, FieldSelect } from '../components/ui.jsx';
 import MemberGate from '../components/MemberGate.jsx';
 import { PhotoPicker } from '../components/Photos.jsx';
 import RadarChart from '../components/RadarChart.jsx';
@@ -206,44 +206,64 @@ function NoteFormInner({ preview = false }) {
 
         <Card className="space-y-5 p-5 sm:p-6">
           <SectionTitle n="1">어떤 커피였나요</SectionTitle>
+          {/* 원두 · 어디서 · 언제 */}
           <div>
             <Label htmlFor="bean_name" hint="필수">원두 이름</Label>
             <input {...bind('bean_name')} maxLength={80} className="field" placeholder="예: 에티오피아 예가체프 코체레" aria-invalid={touched && beanMissing} />
             {touched && beanMissing && <p className="mt-1.5 text-sm text-accent">원두 이름을 적어 주세요.</p>}
           </div>
-          <div>
-            <Label htmlFor="roaster">로스터리 · 카페</Label>
-            <input {...bind('roaster')} maxLength={60} className="field" placeholder="어디서 샀거나 마셨나요" />
+          <div className="grid grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] gap-3">
+            <div>
+              <Label htmlFor="roaster">로스터리 · 카페</Label>
+              <input {...bind('roaster')} maxLength={60} className="field" placeholder="어디서 샀나요" />
+            </div>
+            <div>
+              <Label htmlFor="tasted_on">마신 날</Label>
+              <input {...bind('tasted_on')} type="date" max={today()} className="field px-3" />
+            </div>
           </div>
-          <div>
-            <Label htmlFor="origin" hint="지도에서 나라를 누르거나 직접 입력">산지</Label>
-            <WorldMap
-              selectedId={originMatch?.id}
-              onSelect={(o) => setForm((f) => ({ ...f, origin: keepRegion(f.origin, o.name) }))}
-              className="mb-2.5"
-            />
+
+          {/* 산지: 입력이 먼저, 지도는 눌러서 고르는 보조 */}
+          <div className="border-t border-line pt-5">
+            <Label htmlFor="origin" hint="입력하거나 지도에서 나라 누르기">산지</Label>
             <input {...bind('origin')} maxLength={60} className="field" list="origin-list" placeholder="예: 에티오피아 구지 · 블렌드" />
             <datalist id="origin-list">{ORIGINS.map((o) => <option key={o} value={o} />)}</datalist>
             {!form.origin.trim() && guessedOrigin && (
               <button
                 type="button"
                 onClick={() => setForm((f) => ({ ...f, origin: guessedOrigin.name }))}
-                className="mt-2 inline-flex min-h-11 items-center gap-1.5 rounded-full bg-accent-soft px-3.5 text-sm font-semibold text-accent-strong sm:min-h-9"
+                className="mt-2 inline-flex min-h-10 items-center gap-1.5 rounded-full bg-accent-soft px-3.5 text-sm font-semibold text-accent-strong sm:min-h-9"
               >
                 <MapPin size={14} /> 원두 이름에 있는 ‘{guessedOrigin.name}’로 넣기
               </button>
             )}
+            <WorldMap
+              selectedId={originMatch?.id}
+              onSelect={(o) => setForm((f) => ({ ...f, origin: keepRegion(f.origin, o.name) }))}
+              className="mt-2.5"
+            />
           </div>
-          <OptionRow label="가공 방식" options={PROCESSES} value={form.process} onChange={set('process')} />
-          {form.process === '기타' && <div>
-            <Label htmlFor="customProcess" hint="선택 · 최대 30자">가공 방식 직접 입력</Label>
-            <input {...bind('customProcess')} maxLength={30} className="field" placeholder="예: 카보닉 매서레이션" />
-          </div>}
-          <OptionRow label="로스팅" options={ROAST_LEVELS} value={form.roast_level} onChange={set('roast_level')} />
-          <OptionRow label="추출 방식" options={BREW_METHODS} value={form.brew_method} onChange={set('brew_method')} />
-          <div className="sm:w-1/2">
-            <Label htmlFor="tasted_on">마신 날</Label>
-            <input {...bind('tasted_on')} type="date" max={today()} className="field" />
+
+          {/* 가공 · 로스팅 · 추출: 드롭다운 세 칸 */}
+          <div className="grid grid-cols-2 gap-3 border-t border-line pt-5 md:grid-cols-3">
+            <div>
+              <Label htmlFor="process">가공 방식</Label>
+              <FieldSelect id="process" value={form.process} onChange={set('process')} options={PROCESSES} />
+            </div>
+            <div>
+              <Label htmlFor="roast_level">로스팅</Label>
+              <FieldSelect id="roast_level" value={form.roast_level} onChange={set('roast_level')} options={ROAST_LEVELS} />
+            </div>
+            <div className="col-span-2 md:col-span-1">
+              <Label htmlFor="brew_method">추출 방식</Label>
+              <FieldSelect id="brew_method" value={form.brew_method} onChange={set('brew_method')} options={BREW_METHODS} />
+            </div>
+            {form.process === '기타' && (
+              <div className="col-span-2 md:col-span-3">
+                <Label htmlFor="customProcess" hint="선택 · 최대 30자">가공 방식 직접 입력</Label>
+                <input {...bind('customProcess')} maxLength={30} className="field" placeholder="예: 카보닉 매서레이션" />
+              </div>
+            )}
           </div>
         </Card>
 
@@ -362,29 +382,5 @@ function SectionTitle({ n, children }) {
       <span className="grid size-6 place-items-center rounded-full bg-ink font-display text-xs text-paper">{n}</span>
       {children}
     </h2>
-  );
-}
-
-function OptionRow({ label, options, value, onChange }) {
-  return (
-    <fieldset>
-      <legend className="mb-2 text-sm font-semibold">{label}</legend>
-      <div className="flex flex-wrap gap-1.5">
-        {options.map((o) => (
-          <button
-            key={o}
-            type="button"
-            aria-pressed={value === o}
-            onClick={() => onChange(value === o ? '' : o)}
-            className={cx(
-              'h-11 rounded-full border px-3.5 text-sm sm:h-9 transition-colors',
-              value === o ? 'border-ink bg-ink font-semibold text-paper' : 'border-line bg-surface text-ink-soft hover:border-line-strong',
-            )}
-          >
-            {o}
-          </button>
-        ))}
-      </div>
-    </fieldset>
   );
 }
