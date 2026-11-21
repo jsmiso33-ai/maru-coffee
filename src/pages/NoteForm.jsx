@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
-import { ArrowLeft, CalendarDays, MapPin, Plus } from 'lucide-react';
+import { ArrowLeft, CalendarDays, MapPin, Plus, X } from 'lucide-react';
 import { getActivity, getNote, listActivities, saveNote } from '../lib/db.js';
 import { daysUntil, formatDay } from '../lib/format.js';
 import { useAuth } from '../lib/auth.jsx';
 import { isConfigured } from '../lib/supabase.js';
 import { ATTRIBUTES, BREW_METHODS, ORIGINS, PROCESSES, ROAST_LEVELS, processOption } from '../data/options.js';
-import { FLAVOR_GROUPS } from '../data/flavors.js';
+import { FLAVOR_GROUPS, flavorDot } from '../data/flavors.js';
 import { Button, Card, FlavorChip, Label, Notice, ScaleInput, Spinner, StarInput, cx, FieldSelect } from '../components/ui.jsx';
 import MemberGate from '../components/MemberGate.jsx';
 import { PhotoPicker } from '../components/Photos.jsx';
@@ -16,6 +16,8 @@ import { matchOrigin } from '../data/origins.js';
 import { NotFound } from './NotFound.jsx';
 
 const MAX_FLAVORS = 12;
+// 휴대폰 분류 탭은 4칸이라 긴 이름은 줄여서
+const TAB_SHORT = { '견과·초콜릿': '초콜릿', '향신료·기타': '향신료' };
 
 function today() {
   const d = new Date();
@@ -50,6 +52,7 @@ function NoteFormInner({ preview = false }) {
   const [error, setError] = useState('');
   const [touched, setTouched] = useState(false);
   const [customFlavor, setCustomFlavor] = useState('');
+  const [flavorGroup, setFlavorGroup] = useState(FLAVOR_GROUPS[0].name);
   const [params] = useSearchParams();
   const requestedActivityId = id ? null : params.get('activity');
   const [activities, setActivities] = useState([]);
@@ -122,8 +125,6 @@ function NoteFormInner({ preview = false }) {
   const originMatch = matchOrigin(form.origin);
   const guessedOrigin = matchOrigin(form.bean_name);
 
-  const allPreset = new Set(FLAVOR_GROUPS.flatMap((g) => g.items));
-  const customSelected = form.flavors.filter((f) => !allPreset.has(f));
   const beanMissing = !form.bean_name.trim();
 
   const submit = async (e) => {
@@ -287,39 +288,88 @@ function NoteFormInner({ preview = false }) {
             <span className="text-sm text-muted tnum">{form.flavors.length}/{MAX_FLAVORS}</span>
           </div>
           <p className="mt-1 text-sm text-muted">확실하지 않아도 괜찮아요. 떠오르는 것을 골라 보세요.</p>
-          <div className="mt-5 space-y-4">
-            {FLAVOR_GROUPS.map((g) => (
-              <div key={g.name}>
-                <p className="mb-2 text-xs font-semibold text-muted">{g.name}</p>
-                <div className="flex flex-wrap gap-1.5">
-                  {g.items.map((f) => (
-                    <FlavorChip key={f} name={f} selected={form.flavors.includes(f)} onClick={() => toggleFlavor(f)} />
-                  ))}
-                </div>
-              </div>
-            ))}
-            <div>
-              <p className="mb-2 text-xs font-semibold text-muted">직접 추가</p>
-              <div className="flex flex-wrap gap-1.5">
-                {customSelected.map((f) => (
-                  <FlavorChip key={f} name={f} selected onClick={() => toggleFlavor(f)} />
-                ))}
-              </div>
-              <div className="mt-2 flex max-w-sm gap-2">
+          {/* 고른 향미: 위에 모아 보여 주고 누르면 빼기 */}
+          <div className="mt-4 flex min-h-11 flex-wrap items-center gap-1.5 rounded-xl bg-sunken/60 p-2">
+            {form.flavors.length ? (
+              form.flavors.map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => toggleFlavor(f)}
+                  aria-label={`${f} 빼기`}
+                  className="inline-flex h-9 items-center gap-1.5 rounded-full bg-ink pl-3 pr-2 text-sm font-semibold text-paper"
+                >
+                  <span aria-hidden className="size-1.5 rounded-full" style={{ background: flavorDot(f) }} />
+                  {f} <X size={13} className="opacity-70" />
+                </button>
+              ))
+            ) : (
+              <span className="px-2 text-sm text-muted">아래에서 골라 주세요</span>
+            )}
+          </div>
+
+          {/* 분류 탭 → 그 분류의 향미만 */}
+          <div role="tablist" aria-label="향미 분류" className="mt-4 grid grid-cols-4 gap-1.5 sm:flex sm:flex-wrap">
+            {FLAVOR_GROUPS.map((g) => {
+              const n = g.items.filter((i) => form.flavors.includes(i)).length;
+              const active = flavorGroup === g.name;
+              return (
+                <button
+                  key={g.name}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  aria-label={g.name}
+                  onClick={() => setFlavorGroup(g.name)}
+                  className={cx(
+                    'inline-flex h-10 min-w-0 items-center justify-center gap-1 rounded-full border px-2 text-[0.8rem] font-semibold whitespace-nowrap transition-colors sm:px-3.5 sm:text-sm',
+                    active ? 'border-ink bg-surface text-ink' : 'border-transparent bg-sunken/70 text-ink-soft hover:text-ink',
+                  )}
+                >
+                  <span aria-hidden className="hidden size-2 shrink-0 rounded-full sm:inline-block" style={{ background: g.dot }} />
+                  <span className="sm:hidden">{TAB_SHORT[g.name] ?? g.name}</span>
+                  <span className="hidden sm:inline">{g.name}</span>
+                  {n > 0 && <span className="text-xs text-accent tnum">{n}</span>}
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              role="tab"
+              aria-selected={flavorGroup === '직접'}
+              onClick={() => setFlavorGroup('직접')}
+              className={cx(
+                'inline-flex h-10 min-w-0 items-center justify-center gap-1 rounded-full border px-2 text-[0.8rem] font-semibold whitespace-nowrap sm:px-3.5 sm:text-sm',
+                flavorGroup === '직접' ? 'border-ink bg-surface text-ink' : 'border-transparent bg-sunken/70 text-ink-soft hover:text-ink',
+              )}
+            >
+              <Plus size={13} /> 직접
+            </button>
+          </div>
+
+          <div className="mt-3 min-h-[5.5rem]">
+            {flavorGroup === '직접' ? (
+              <div className="flex max-w-sm gap-2">
                 <input
                   value={customFlavor}
                   onChange={(e) => setCustomFlavor(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustomFlavor(); } }}
                   maxLength={20}
-                  className="field h-10 py-0"
+                  className="field h-11 py-0"
                   placeholder="예: 유자, 곶감"
                   aria-label="향미 직접 입력"
                 />
-                <Button variant="outline" size="sm" className="h-10 shrink-0" onClick={addCustomFlavor} disabled={!customFlavor.trim() || form.flavors.length >= MAX_FLAVORS}>
+                <Button variant="outline" className="h-11 shrink-0" onClick={addCustomFlavor} disabled={!customFlavor.trim() || form.flavors.length >= MAX_FLAVORS}>
                   <Plus size={15} /> 추가
                 </Button>
               </div>
-            </div>
+            ) : (
+              <div className="flex flex-wrap gap-1.5">
+                {FLAVOR_GROUPS.find((g) => g.name === flavorGroup).items.map((f) => (
+                  <FlavorChip key={f} name={f} selected={form.flavors.includes(f)} onClick={() => toggleFlavor(f)} />
+                ))}
+              </div>
+            )}
           </div>
         </Card>
 
