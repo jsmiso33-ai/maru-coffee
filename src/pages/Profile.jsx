@@ -8,6 +8,7 @@ import { FLAVOR_GROUPS, flavorDot } from '../data/flavors.js';
 import { matchOrigin } from '../data/origins.js';
 import { Avatar, Button, Card, Notice, Spinner, cx } from '../components/ui.jsx';
 import RadarChart from '../components/RadarChart.jsx';
+import FlavorWheel from '../components/FlavorWheel.jsx';
 import NoteCard from '../components/NoteCard.jsx';
 import MemberGate from '../components/MemberGate.jsx';
 
@@ -69,6 +70,7 @@ export default function Profile() {
       avg,
       top,
       flavors: flavors.slice(0, 5),
+      flavorCounts: new Map(flavors),
       groups: groups.slice(0, 4),
       origins,
       process: count(notes.map((n) => n.process))[0]?.[0],
@@ -143,7 +145,9 @@ export default function Profile() {
           {s.flavors.length > 0 && (
             <section className="mt-8">
               <h2 className="mb-3 text-lg font-bold">자주 적은 향미</h2>
-              <Card className="p-5">
+              <Card className="grid items-center gap-6 p-5 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+                {/* 지금까지 고른 향미를 휠에 — 많이 고를수록 진하게 */}
+                <FlavorWheel counts={s.flavorCounts} size="sm" />
                 <ol className="space-y-2.5">
                   {s.flavors.map(([f, n], i) => (
                     <li key={f} className="grid grid-cols-[1.25rem_6.5rem_1fr_2rem] items-center gap-2 text-sm">

@@ -7,6 +7,7 @@ import { ATTRIBUTES } from '../data/options.js';
 import { Avatar, Button, Card, FlavorChip, Notice, Spinner, Stars } from '../components/ui.jsx';
 import { NotFound } from './NotFound.jsx';
 import Comments from '../components/Comments.jsx';
+import FlavorWheel from '../components/FlavorWheel.jsx';
 import { PhotoStrip } from '../components/Photos.jsx';
 import { removePhotos } from '../lib/photos.js';
 import WorldMap from '../components/WorldMap.jsx';
@@ -120,6 +121,7 @@ export default function NoteDetail() {
           {note.flavors?.length > 0 && (
             <Card className="p-5">
               <h2 className="text-sm font-semibold text-muted">느낀 향미</h2>
+              <FlavorWheel selected={note.flavors} size="sm" className="mt-3" />
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {note.flavors.map((f) => <FlavorChip key={f} name={f} />)}
               </div>
