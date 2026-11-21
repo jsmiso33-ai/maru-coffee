@@ -254,6 +254,25 @@ a.desktop-nav-link:hover, .desktop-nav-link.is-current { color: var(--color-acce
   }
 }
 
+/* ───── 로스팅 슬라이더 ───── */
+.roast-range { -webkit-appearance: none; appearance: none; height: 44px; background: transparent; cursor: pointer; }
+.roast-range:focus-visible { outline: none; }
+.roast-range::-webkit-slider-runnable-track { height: 10px; background: transparent; }
+.roast-range::-moz-range-track { height: 10px; background: transparent; }
+.roast-range::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 28px; height: 28px; margin-top: -9px; border-radius: 50%;
+  background: var(--roast-thumb, var(--color-surface)); border: 3px solid var(--color-surface);
+  box-shadow: 0 0 0 1.5px var(--color-ink), 0 3px 8px rgb(48 42 37 / .35);
+}
+.roast-range::-moz-range-thumb {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--roast-thumb, var(--color-surface)); border: 3px solid var(--color-surface);
+  box-shadow: 0 0 0 1.5px var(--color-ink), 0 3px 8px rgb(48 42 37 / .35);
+}
+.roast-range[data-empty='true']::-webkit-slider-thumb { box-shadow: 0 0 0 1.5px var(--color-line-strong); }
+.roast-range[data-empty='true']::-moz-range-thumb { box-shadow: 0 0 0 1.5px var(--color-line-strong); }
+.roast-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--color-accent); }
+
 /* ───── 카페 지도 (Leaflet) ───── */
 .cafe-map { isolation: isolate; background: var(--color-sunken); }
 .cafe-map .leaflet-tile-pane { filter: saturate(0.55) sepia(0.12) brightness(1.02); }

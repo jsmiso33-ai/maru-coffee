@@ -4,7 +4,7 @@ import { SAMPLE_NOTES } from '../data/sampleNotes.js';
 
 // 작성자·작성일 컬럼은 DB 트리거가 채우므로 클라이언트는 아래 필드만 보낸다.
 const NOTE_FIELDS = [
-  'bean_name', 'roaster', 'origin', 'process', 'roast_level', 'brew_method', 'tasted_on',
+  'bean_name', 'roaster', 'origin', 'process', 'roast_level', 'roast_value', 'brew_method', 'tasted_on',
   'flavors', 'acidity', 'sweetness', 'body', 'bitterness', 'aftertaste', 'rating', 'memo',
   'activity_id', 'activity_bean_id', 'photos',
 ];

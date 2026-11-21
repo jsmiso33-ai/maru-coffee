@@ -8,6 +8,7 @@ import { Avatar, Button, Card, FlavorChip, Notice, Spinner, Stars } from '../com
 import { NotFound } from './NotFound.jsx';
 import Comments from '../components/Comments.jsx';
 import FlavorWheel from '../components/FlavorWheel.jsx';
+import { RoastMeter } from '../components/RoastSlider.jsx';
 import { PhotoStrip } from '../components/Photos.jsx';
 import { removePhotos } from '../lib/photos.js';
 import WorldMap from '../components/WorldMap.jsx';
@@ -52,7 +53,12 @@ export default function NoteDetail() {
   const facts = [
     ['산지', note.origin],
     ['가공', note.process],
-    ['로스팅', note.roast_level],
+    ['로스팅', note.roast_level && (
+      <span className="block">
+        {note.roast_level}
+        {note.roast_value != null && <RoastMeter value={note.roast_value} className="mt-2 max-w-[9rem]" />}
+      </span>
+    )],
     ['추출', note.brew_method],
     ['마신 날', formatDate(note.tasted_on)],
   ].filter(([, v]) => v);

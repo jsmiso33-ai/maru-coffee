@@ -5,13 +5,14 @@ import { getActivity, getNote, listActivities, saveNote } from '../lib/db.js';
 import { daysUntil, formatDay } from '../lib/format.js';
 import { useAuth } from '../lib/auth.jsx';
 import { isConfigured } from '../lib/supabase.js';
-import { ATTRIBUTES, BREW_METHODS, ORIGINS, PROCESSES, ROAST_LEVELS, processOption } from '../data/options.js';
+import { ATTRIBUTES, BREW_METHODS, ORIGINS, PROCESSES, processOption } from '../data/options.js';
 import { FLAVOR_GROUPS, flavorDot } from '../data/flavors.js';
 import { Button, Card, FlavorChip, Label, Notice, ScaleInput, Spinner, StarInput, cx, FieldSelect } from '../components/ui.jsx';
 import MemberGate from '../components/MemberGate.jsx';
 import { PhotoPicker } from '../components/Photos.jsx';
 import RadarChart from '../components/RadarChart.jsx';
 import FlavorWheel from '../components/FlavorWheel.jsx';
+import RoastSlider, { roastLabel, roastValueOf } from '../components/RoastSlider.jsx';
 import WorldMap from '../components/WorldMap.jsx';
 import { matchOrigin } from '../data/origins.js';
 import { NotFound } from './NotFound.jsx';
@@ -26,7 +27,7 @@ function today() {
 const EMPTY = {
   bean_name: '', roaster: '', origin: '', process: '', customProcess: '', roast_level: '', brew_method: '',
   tasted_on: today(), flavors: [], acidity: 3, sweetness: 3, body: 3, bitterness: 3, aftertaste: 3,
-  rating: 3.5, memo: '', activity_id: '', activity_bean_id: '',
+  rating: 3.5, memo: '', activity_id: '', activity_bean_id: '', roast_value: null,
   photos: [],
 };
 
@@ -95,7 +96,7 @@ function NoteFormInner({ preview = false }) {
     getNote(id)
       .then((n) => {
         if (!n || n.user_id !== user?.id) setNotFound(true);
-        else setForm({ ...EMPTY, ...Object.fromEntries(Object.entries(n).map(([k, v]) => [k, v ?? ''])), ...processFields(n.process), rating: Number(n.rating) });
+        else setForm({ ...EMPTY, ...Object.fromEntries(Object.entries(n).map(([k, v]) => [k, v ?? ''])), ...processFields(n.process), rating: Number(n.rating), roast_value: n.roast_value ?? roastValueOf(n.roast_level) });
       })
       .catch((e) => setLoadError(e.message));
   }, [id, user?.id]);
@@ -145,7 +146,8 @@ function NoteFormInner({ preview = false }) {
     setError('');
     try {
       const process = form.process === '기타' ? form.customProcess.trim() || '기타' : form.process;
-      const saved = await saveNote({ ...form, process, bean_name: form.bean_name.trim() }, id);
+      const roast_value = form.roast_value === '' || form.roast_value == null ? null : Number(form.roast_value);
+      const saved = await saveNote({ ...form, process, roast_value, roast_level: roastLabel(roast_value), bean_name: form.bean_name.trim() }, id);
       navigate(`/notes/${saved.id}`, { replace: true });
     } catch (err) {
       setError(err.message);
@@ -252,25 +254,25 @@ function NoteFormInner({ preview = false }) {
           </div>
 
           {/* 가공 · 로스팅 · 추출: 드롭다운 세 칸 */}
-          <div className="grid grid-cols-2 gap-3 border-t border-line pt-5 md:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 border-t border-line pt-5">
             <div>
               <Label htmlFor="process">가공 방식</Label>
               <FieldSelect id="process" value={form.process} onChange={set('process')} options={PROCESSES} />
             </div>
             <div>
-              <Label htmlFor="roast_level">로스팅</Label>
-              <FieldSelect id="roast_level" value={form.roast_level} onChange={set('roast_level')} options={ROAST_LEVELS} />
-            </div>
-            <div className="col-span-2 md:col-span-1">
               <Label htmlFor="brew_method">추출 방식</Label>
               <FieldSelect id="brew_method" value={form.brew_method} onChange={set('brew_method')} options={BREW_METHODS} />
             </div>
             {form.process === '기타' && (
-              <div className="col-span-2 md:col-span-3">
+              <div className="col-span-2">
                 <Label htmlFor="customProcess" hint="선택 · 최대 30자">가공 방식 직접 입력</Label>
                 <input {...bind('customProcess')} maxLength={30} className="field" placeholder="예: 카보닉 매서레이션" />
               </div>
             )}
+            {/* 로스팅: 라이트~다크 사이 어디쯤인지 밀어서 */}
+            <div className="col-span-2 mt-1">
+              <RoastSlider id="roast_value" value={form.roast_value} onChange={set('roast_value')} />
+            </div>
           </div>
         </Card>
 
@@ -458,7 +460,7 @@ function applyActivity(form, activity, bean) {
     next.roaster = bean.roaster ?? '';
     next.origin = bean.origin ?? '';
     Object.assign(next, processFields(bean.process));
-    next.roast_level = bean.roast_level ?? '';
+    next.roast_value = roastValueOf(bean.roast_level);
   }
   return next;
 }
