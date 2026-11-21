@@ -219,14 +219,14 @@ function NoteFormInner({ preview = false }) {
             <input {...bind('bean_name')} maxLength={80} className="field" placeholder="예: 에티오피아 예가체프 코체레" aria-invalid={touched && beanMissing} />
             {touched && beanMissing && <p className="mt-1.5 text-sm text-accent">원두 이름을 적어 주세요.</p>}
           </div>
-          <div className="grid grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)] gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <div>
               <Label htmlFor="roaster">로스터리 · 카페</Label>
               <input {...bind('roaster')} maxLength={60} className="field" placeholder="어디서 샀나요" />
             </div>
             <div>
               <Label htmlFor="tasted_on">마신 날</Label>
-              <input {...bind('tasted_on')} type="date" max={today()} className="field px-3" />
+              <input {...bind('tasted_on')} type="date" max={today()} className="field px-2.5" />
             </div>
           </div>
 

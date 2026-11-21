@@ -88,6 +88,22 @@ body {
   .field[aria-invalid='true'] {
     border-color: var(--color-accent);
   }
+  /* 날짜 칸: 브라우저 기본 최소 너비 때문에 좁은 칸에서 삐져나오지 않게 */
+  .field[type='date'] {
+    min-width: 0;
+    display: block;
+  }
+  .field[type='date']::-webkit-date-and-time-value {
+    text-align: left;
+  }
+  /* iOS 사파리는 날짜 칸에 자체 모양·최소 너비를 강제 → 걷어내고 높이를 다른 칸과 맞춘다 */
+  @supports (-webkit-touch-callout: none) {
+    .field[type='date'] {
+      -webkit-appearance: none;
+      appearance: none;
+      min-height: 2.9rem;
+    }
+  }
 }
 
 input[type='number']::-webkit-inner-spin-button,
