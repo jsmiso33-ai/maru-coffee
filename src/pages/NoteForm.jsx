@@ -277,9 +277,18 @@ function NoteFormInner({ preview = false }) {
         </Card>
 
         <Card className="p-5 sm:p-6">
-          <SectionTitle n="2">맛은 어땠나요</SectionTitle>
-          <div className="mt-5 grid items-center gap-6 md:grid-cols-[1fr_auto]">
-            <div className="space-y-5">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <SectionTitle n="2">맛은 어땠나요</SectionTitle>
+              <p className="mt-1 text-sm text-muted">1 약함 · 5 강함</p>
+            </div>
+            {/* 휴대폰: 제목 옆 작은 맛 그래프로 바로 확인 */}
+            <div className="-my-1 shrink-0 md:hidden" aria-hidden>
+              <RadarChart note={form} size={84} compact />
+            </div>
+          </div>
+          <div className="mt-5 grid items-center gap-8 md:grid-cols-[minmax(0,1fr)_auto]">
+            <div className="space-y-3">
               {ATTRIBUTES.map((a) => (
                 <ScaleInput key={a.key} label={a.label} low={a.low} high={a.high} value={form[a.key]} onChange={set(a.key)} />
               ))}

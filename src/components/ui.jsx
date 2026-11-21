@@ -129,32 +129,34 @@ export function StarInput({ value, onChange }) {
   );
 }
 
-// 1~5 단계 선택 (산미·단맛 등)
+// 1~5 단계 선택 (산미·단맛 등) — 한 줄: 왼쪽 이름(+지금 값의 뜻), 오른쪽 1~5
 export function ScaleInput({ label, low, high, value, onChange }) {
+  const word = value <= 2 ? low : value >= 4 ? high : '보통';
   return (
-    <fieldset>
-      <legend className="flex w-full items-baseline justify-between text-sm">
-        <span className="font-semibold text-ink">{label}</span>
-        <span className="text-xs text-muted">{low} → {high}</span>
-      </legend>
-      <div className="mt-2 grid grid-cols-5 gap-1.5">
+    <div role="radiogroup" aria-label={`${label} (1 ${low} ~ 5 ${high})`} className="grid grid-cols-[4.25rem_minmax(0,1fr)] items-center gap-3">
+      <div className="min-w-0">
+        <p className="text-sm font-bold leading-tight text-ink">{label}</p>
+        <p className="truncate text-xs leading-tight text-muted">{word}</p>
+      </div>
+      <div className="grid grid-cols-5 gap-1">
         {[1, 2, 3, 4, 5].map((n) => (
           <button
             key={n}
             type="button"
-            aria-pressed={value === n}
-            aria-label={`${label} ${n}단계`}
+            role="radio"
+            aria-checked={value === n}
+            aria-label={`${label} ${n}${n === 1 ? ` (${low})` : n === 5 ? ` (${high})` : ''}`}
             onClick={() => onChange(n)}
             className={cx(
-              'h-11 rounded-xl border text-sm font-semibold tnum transition-colors duration-150',
-              value === n ? 'border-ink bg-ink text-paper' : n <= value ? 'border-line-strong bg-sunken text-ink' : 'border-line bg-surface text-muted hover:border-line-strong',
+              'h-10 rounded-lg text-sm font-semibold tnum transition-colors',
+              value === n ? 'bg-ink text-paper' : n < value ? 'bg-accent-soft text-accent-strong' : 'bg-sunken/70 text-muted hover:bg-sunken hover:text-ink',
             )}
           >
             {n}
           </button>
         ))}
       </div>
-    </fieldset>
+    </div>
   );
 }
 
